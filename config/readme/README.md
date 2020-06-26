@@ -4,11 +4,11 @@
 [![Maven Central][central_badge]][central_href]
 [![License][license_badge]][license_href]
 
-The jpackage maven plugin lets you create a custom runtime image with
-the jpackage tool introduced in Java 13.
+The jpackage maven plugin lets you create a custom runtime image/installer with
+the jpackage tool introduced in Java 14.
 
 The main idea is to avoid being tied to project artifacts and allow the user
-to fully control the process of creating an image.
+to fully control the process of creating an image/installer.
 
 [The detailed documentation for this plugin is available here.][goals]
 
