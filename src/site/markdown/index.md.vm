@@ -61,7 +61,7 @@ you can take a look into the following examples:
 [faq]: faq.html
 [usage]: usage.html
 [goals]: plugin-info.html
-[jlinkmojo]: jpackage-mojo.html
+[jpackagemojo]: jpackage-mojo.html
 [helpmojo]: help-mojo.html
 [from-runtime-image]: examples/from-runtime-image.html
 [from-application-image]: examples/from-application-image.html

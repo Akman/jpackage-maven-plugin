@@ -1,0 +1,33 @@
+Apache Public License 2.0: Plexus Cipher: encryption/decryption Component, Plexus Security Dispatcher Component
+
+Apache 2.0: error-prone annotations
+
+Eclipse Public License 1.0: JUnit
+
+MIT License: SLF4J API Module
+
+BSD-3-Clause: asm
+
+Public Domain: AOP alliance
+
+GNU Lesser General Public License: Logback Classic Module, Logback Core Module
+
+New BSD License: Hamcrest Core
+
+Eclipse Public License, Version 1.0: org.eclipse.sisu.inject, org.eclipse.sisu.plexus
+
+Unknown: Default Plexus Container, classworlds
+
+The MIT License: Checker Qual
+
+Apache License, Version 2.0: Apache Commons Lang, Apache Commons Text, Apache Maven File Management API, Apache Maven Shared I/O API, Apache Maven Shared Utils, Apache Maven Wagon :: API, CDI APIs, Maven Artifact, Maven Artifact Resolver API, Maven Artifact Resolver Implementation, Maven Artifact Resolver Provider, Maven Artifact Resolver SPI, Maven Artifact Resolver Utilities, Maven Builder Support, Maven Compat, Maven Core, Maven Model, Maven Model Builder, Maven Plugin API, Maven Plugin Testing Mechanism, Maven Plugin Tools Java Annotations, Maven Repository Metadata Model, Maven Settings, Maven Settings Builder, Plexus :: Component Annotations, Plexus Classworlds, Plexus Common Utilities, Plexus Interpolation API, Plexus Languages :: Java
+
+COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0: JSR-250 Common Annotations for the JavaTM Platform
+
+GNU General Public License, version 2 (GPL2), with the classpath exception: Checker Qual
+
+MIT license: Animal Sniffer Annotations
+
+The Apache Software License, Version 2.0: Commons IO, FindBugs-jsr305, Google Guice - Core Library, Guava: Google Core Libraries for Java, J2ObjC Annotations, JPackage Maven Plugin, Plexus Archiver Component, Plexus IO Components, QDox, javax.inject
+
+Eclipse Public License - v 1.0: Logback Classic Module, Logback Core Module
