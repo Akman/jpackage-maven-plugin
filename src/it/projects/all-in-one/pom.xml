@@ -1,0 +1,621 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2020 Alexander Kapitman
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+    http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.akman</groupId>
+  <artifactId>hello</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>JPackage maven plugin integration test</name>
+  <description>
+    Simple JavaFX application using
+    slf4j, logback-classic and picocli libraries
+  </description>
+
+  <properties>
+    <jdk.toolchain>jdk13</jdk.toolchain>
+    <default.encoding>UTF-8</default.encoding>
+    <java.source.version>13</java.source.version>
+    <java.target.version>13</java.target.version>
+    <java.release.version>13</java.release.version>
+    <javafx.version>13.0.2</javafx.version>
+    <slf4j.version>2.0.0-alpha1</slf4j.version>
+    <logback.version>1.3.0-alpha4</logback.version>
+    <picocli.version>4.3.2</picocli.version>
+    <application.name>hello</application.name>
+    <application.image.name>hello</application.image.name>
+    <application.image.version>1.0</application.image.version>
+    <application.module>hello</application.module>
+    <application.class>ru.akman.hello.Main</application.class>
+    <application.jvm.args>-Dfile.encoding=${default.encoding} -Xms256m -Xmx512m</application.jvm.args>
+    <application.args>--gui</application.args>
+    <application.description>${project.description}</application.description>
+    <application.copyright>Copyright (C) 2020 Alexander Kapitman</application.copyright>
+    <application.vendor>Akman</application.vendor>
+    <project.build.sourceEncoding>${default.encoding}</project.build.sourceEncoding>
+    <build.dir>${project.build.directory}</build.dir>
+    <jpackage.dir>${project.build.directory}/jpackage</jpackage.dir>
+    <jpackage.config.dir>${project.basedir}/config/jpackage</jpackage.config.dir>
+    <jpackage.platform.dir>${jpackage.config.dir}/${platformFamily}</jpackage.platform.dir>
+    <jpackage.resources.dir>${jpackage.platform.dir}/resources</jpackage.resources.dir>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-base</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-swing</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-web</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-media</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>${picocli.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>@project.groupId@</groupId>
+          <artifactId>@project.artifactId@</artifactId>
+          <version>@project.version@</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>3.0.0-M1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>3.0.0-M1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>@project.groupId@</groupId>
+        <artifactId>@project.artifactId@</artifactId>
+        <executions>
+          <execution>
+            <id>jpackage-installer</id>
+            <goals>
+              <goal>jpackage</goal>
+            </goals>
+            <configuration>
+              <!--
+                Specifies the JDK home path which provides the tool needed.
+                If not specified the jpackage tool executable will be find in
+                the following order:
+
+                  - user specified JDK home directory by toolchains-plugin
+                  - JDK home directory specified by system variable JAVA_HOME
+                  - system path specified by system variable PATH
+              -->
+              <toolhome>${env.JPACKAGE_HOME}</toolhome>
+
+
+              <!-- generic options -->
+
+
+              <!--
+                Specifies the location in which generated output files are placed.
+                Default value: ${project.build.directory}/jpackage
+              -->
+              <dest>${jpackage.dir}</dest>
+              <!--
+                Specifies the location in which temporary files are placed.
+                If specified, the directory will not be removed upon the task
+                completion and must be removed manually.
+              -->
+              <!--temp>${project.build.directory}/jpackage/temp-app-image</temp-->
+              <!--
+                Specifies the name of subdirectory relative to
+                the destination directory in which files of generated
+                application image are placed.
+              -->
+              <name>${application.image.name}</name>
+              <!--
+                Specifies the type of package to
+                create: { PLATFORM | IMAGE | EXE | MSI }.
+                Default value: PLATFORM (a platform dependent default type)
+              -->
+              <type>PLATFORM</type>
+              <!--
+                Enable verbose tracing.
+                Default value: false.
+              -->
+              <verbose>true</verbose>
+              <!--
+                Specifies version of the application and/or package.
+              -->
+              <appversion>${application.image.version}</appversion>
+              <!--
+                Specifies copyright for the application.
+              -->
+              <copyright>${application.copyright}</copyright>
+              <!--
+                Specifies description of the application.
+              -->
+              <description>${application.description}</description>
+              <!--
+                Specifies vendor of the application.
+              -->
+              <vendor>${application.vendor}</vendor>
+
+
+              <!-- options for creating the application image -->
+
+
+              <!--
+                Specifies the location of the icon of the application package.
+              -->
+              <icon>${jpackage.resources.dir}/${application.name}.${platformIconExtension}</icon>
+              <!--
+                Specifies the location of the input directory that contains
+                the files to be packaged. All files in the input directory
+                will be packaged into the application image.
+              -->
+              <!--input>${project.build.directory}/jlink/libs</input-->
+
+
+              <!-- options for creating the runtime image -->
+
+
+              <!--
+                Specifies the location of the predefined runtime
+                image (result of jlink) that will be copied into
+                the application image.
+                If not specified, jpackage will run jlink to create
+                the runtime image using options:
+                  - strip-debug
+                  - no-header-files
+                  - no-man-pages
+                  - strip-native-commands
+              -->
+              <!--runtimeimage>${image.dir}</runtimeimage-->
+              <!--
+                Specifies the module path. The path where the jlink tool
+                discovers observable modules: modular JAR files, JMOD files,
+                exploded modules. If this option is not specified, then
+                the default module path is $JAVA_HOME/jmods. This directory
+                contains the java.base module and the other standard and
+                JDK modules. If this option is specified but the java.base
+                module cannot be resolved from it, then the jlink command
+                appends $JAVA_HOME/jmods to the module path.
+                Pass on &dash;-modulepath option to jlink.
+              
+                pathelements - passed to jlink as is
+                filesets - sets of files (without directories)
+                dirsets - sets of directories (without files)
+                dependencysets - sets of dependencies with specified includes
+                                 and excludes patterns (glob: or regex:)
+                                 for file names and regex patterns only
+                                 for module names, and excludes
+                                 for automatic modules
+              -->
+              <modulepath>
+                <dependencysets>
+                  <dependencyset>
+                    <includeoutput>true</includeoutput>
+                    <excludeautomatic>true</excludeautomatic>
+                  </dependencyset>
+                </dependencysets>
+              </modulepath>
+              <!--
+                Specifies the modules names (names of root modules) to add to
+                the runtime image. Their transitive dependencies will add too.
+                This module list, along with the main module (if specified)
+                will be passed to jlink as the &dash;-add-module argument.
+                If not specified, either just the main module (if module
+                is specified), or the default set of modules (if mainjar
+                is specified) are used.
+              -->
+              <addmodules>
+                <addmodule>${application.module}</addmodule>
+              </addmodules>
+              <!--
+                Link service provider modules and their dependencies.
+                Pass on &dash;-bind-services option to jlink.
+                Default value: false.
+              -->
+              <!--bindservices>true</bindservices-->
+
+
+              <!-- options for creating the application launcher(s) -->
+
+
+              <!--
+                Specifies the main module (and optionally main class) of
+                the application. This module must be located on the module path.
+                When this option is specified, the main module will be linked
+                in the Java runtime image.
+                Either module or main-jar option can be specified
+                but not both.
+              -->
+              <module>${application.module}/${application.class}</module>
+              <!--
+                Specifies the main JAR of the application, specified as a path
+                relative to the input path, containing the main class.
+                Either module or mainjar option can be specified but not both.
+              -->
+              <!--mainjar>${project.artifactId}-${project.version}.jar</mainjar-->
+              <!--
+                Specifies the qualified name of the application main class
+                to execute. This option can only be used if mainjar is specified.
+              -->
+              <!--mainclass>${application.class}</mainclass-->
+              <!--
+                Specifies the command line arguments to pass to the main class
+                if no command line arguments are given to the launcher.
+              -->
+              <arguments>${application.args}</arguments>
+              <!--
+                Specifies the options to pass to the Java runtime.
+              -->
+              <javaoptions>${application.jvm.args}</javaoptions>
+              <!--
+                Specifies options are added to, or used to overwrite,
+                the original command line options to build additional
+                alternative launchers.
+              -->
+              <addlaunchers>
+                <addlauncher>
+                  <name>${application.name}-cli</name>
+                  <file>${jpackage.resources.dir}/${application.name}-cli.launcher.properties</file>
+                  <module>${application.module}/${application.class}</module>
+                  <!--mainjar>${application.jar}</mainjar-->
+                  <!--mainclass>${application.class}</mainclass-->
+                  <arguments>--help</arguments>
+                  <javaoptions>-Xms256m -Xmx512m</javaoptions>
+                  <appversion>2.0</appversion>
+                  <icon>${jpackage.resources.dir}/${application.name}-cli.${platformIconExtension}</icon>
+                  <winconsole>true</winconsole>
+                </addlauncher>
+              </addlaunchers>
+
+
+              <!--
+                platform dependent option for creating
+                the application launcher
+              -->
+
+
+              <!--
+                Enable creating a console launcher for the application,
+                should be specified for application which requires console
+                interactions.
+                Default value: false
+              -->
+              <!--winconsole>false</winconsole-->
+
+
+              <!--
+                options for creating the application
+                installable package
+              -->
+
+
+              <!--
+                Specifies the location of the predefined application image
+                that is used to build an installable package.
+              -->
+              <!--appimage>${jpackage.dir}/${application.image.name}</appimage-->
+              <!--
+                Specifies the location of a properties file that contains
+                list of key, value pairs. The keys "extension", "mime-type",
+                "icon", and "description" can be used to describe the association.
+              -->
+              <fileassociations>${jpackage.platform.dir}/associations.properties</fileassociations>
+              <!--
+                Specifies the relative sub-path under the default installation
+                location of the application for Windows, or absolute path of the
+                installation directory of the application for Mac or Linux.
+              -->
+              <installdir>${application.vendor}/${application.image.name}</installdir>
+              <!--
+                Specifies the location of a license file.
+              -->
+              <licensefile>${jpackage.config.dir}/LICENSE</licensefile>
+              <!--
+                Specifies the location of a resources directory that override
+                jpackage resources. Icons, template files, and other resources
+                of jpackage can be overridden by adding replacement resources
+                to this directory.
+              -->
+              <resourcedir>${jpackage.resources.dir}</resourcedir>
+
+
+              <!--
+                WINDOWS platform dependent options for creating
+                the application installable package
+              -->
+
+
+              <!--
+                Enable adding a dialog to choose a directory in which
+                the product is installed.
+                Default value: false
+              -->
+              <windirchooser>true</windirchooser>
+              <!--
+                Enable adding the application to the system menu.
+                Default value: false
+              -->
+              <winmenu>true</winmenu>
+              <!--
+                Start menu group this application is placed in.
+              -->
+              <winmenugroup>${application.vendor}/${application.image.name}</winmenugroup>
+              <!--
+                Enable requesting to perform an install on a per-user basis.
+                Default value: false
+              -->
+              <winperuserinstall>true</winperuserinstall>
+              <!--
+                Enable creating a desktop shortcut for the application.
+                Default value: false
+              -->
+              <winshortcut>true</winshortcut>
+              <!--
+                UUID associated with upgrades for this package.
+              -->
+              <winupgradeuuid>8CF81762-0B19-46A6-875E-1F839A1700D0</winupgradeuuid>
+
+
+              <!--
+                MAC platform dependent options for creating
+                the application installable package
+              -->
+
+              
+              <!--
+                An identifier that uniquely identifies the application for macOS.
+                Defaults to the main class name. May only use
+                alphanumeric (A-Z,a-z,0-9), hyphen (-), and period (.) characters.
+              -->
+              <!--macpackageidentifier>macPackageIdentifier</macpackageidentifier-->
+              <!--
+                Name of the application as it appears in the Menu Bar.
+                This can be different from the application name.
+                This name must be less than 16 characters long and be suitable for
+                displaying in the menu bar and the application Info window.
+                Defaults to the application name.
+              -->
+              <!--macpackagename>macPackageName</macpackagename-->
+              <!--
+                When signing the application package, this value is prefixed
+                to all components that need to be signed that don't have
+                an existing package identifier.
+              -->
+              <!--macpackagesigningprefix>macPackageSigningPrefix</macpackagesigningprefix-->
+              <!--
+                Request that the package be signed.
+                Default value: false
+              -->
+              <!--macsign>false</macsign-->
+              <!--
+                Path of the keychain to search for the signing identity
+                (absolute path or relative to the current directory).
+                If not specified, the standard keychains are used.
+              -->
+              <!--macsigningkeychain>macSigningKeyChain</macsigningkeychain-->
+              <!--
+                Team name portion in Apple signing identities' names.
+                For example "Developer ID Application: ".
+              -->
+              <!--macsigningkeyusername>macSigningKeyUserName</macsigningkeyusername-->
+              
+              
+              <!--
+                LINUX platform dependent options for creating
+                the application installable package
+              -->
+              
+              
+              <!--
+                Name for Linux package, defaults to the application name.
+              -->
+              <!--linuxpackagename>linuxPackageName</linuxpackagename-->
+              <!--
+                Maintainer for .deb package (email).
+              -->
+              <!--linuxdebmaintainer>linuxDebMaintainer</linuxdebmaintainer-->
+              <!--
+                Menu group this application is placed in.
+              -->
+              <!--linuxmenugroup>linuxMenuGroup</linuxmenugroup-->
+              <!--
+                Required packages or capabilities for the application.
+                Default value: false
+              -->
+              <!--linuxpackagedeps>false</linuxpackagedeps-->
+              <!--
+                Type of the license ("License: <name>" of the RPM .spec).
+              -->
+              <!--linuxrpmlicensetype>MIT</linuxrpmlicensetype-->
+              <!--
+                Release value of the RPM <name>.spec file or Debian revision value
+                of the DEB control file.
+              -->
+              <!--linuxapprelease>linuxAppRelease</linuxapprelease-->
+              <!--
+                Group value of the RPM <name>.spec file or Section value
+                of DEB control file.
+              -->
+              <!--linuxappcategory>linuxAppCategory</linuxappcategory-->
+              <!--
+                Creates a shortcut for the application.
+                Default value: false
+              -->
+              <!--linuxshortcut>true</linuxshortcut-->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <encoding>${default.encoding}</encoding>
+          <source>${java.source.version}</source>
+          <target>${java.target.version}</target>
+          <release>${java.release.version}</release>
+          <fork>true</fork>
+          <compilerArgs>
+            <arg>-Xlint:unchecked</arg>
+            <arg>-Xlint:deprecation</arg>
+            <arg>-Werror</arg>
+            <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
+          </compilerArgs>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>info.picocli</groupId>
+              <artifactId>picocli-codegen</artifactId>
+              <version>${picocli.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <outputDirectory>${mods.dir}</outputDirectory>
+          <excludes>
+            <exclude>**/*.bat</exclude>
+            <exclude>**/org.codehaus.plexus.compiler.javac.*</exclude>
+          </excludes>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <manifest>
+              <addDefaultEntries>false</addDefaultEntries>
+              <mainClass>${application.class}</mainClass>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Title>${application.name}</Implementation-Title>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <platformFamily>windows</platformFamily>
+        <platformIconExtension>ico</platformIconExtension>
+      </properties>
+    </profile>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <platformFamily>linux</platformFamily>
+        <platformIconExtension>png</platformIconExtension>
+      </properties>
+    </profile>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <platformFamily>mac</platformFamily>
+        <platformIconExtension>icns</platformIconExtension>
+      </properties>
+    </profile>
+  </profiles>
+
+</project>

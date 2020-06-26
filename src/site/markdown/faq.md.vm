@@ -1,0 +1,54 @@
+## Velocity treats double hashes as comments, so $H can be used instead
+#set( $H = '#' )
+# FAQ
+
+- [What parameters should be used to build a modular application?](#q1)
+- [What parameters should be used to build a non modular application?](#q2)
+- [Can I not use the project artifacts at all?](#q3)
+- [How to exclude automatic modules?](#q4)
+
+$H$H$H <a name="q1" />What parameters should be used to build a modular application?
+
+To create **modular** application use following parameters:
+
+```xml
+  <modulepath> ... </modulepath>
+  <addmodules> ... </addmodules>
+  <module> ... </module>
+```
+
+$H$H$H <a name="q2" />What parameters should be used to build a non modular application?
+
+To create **non-modular** application use following parameters:
+
+```xml
+  <input> ... </input>
+  <mainjar> ... </mainjar>
+  <mainclass> ... </mainclass>
+```
+
+$H$H$H <a name="q3" />Can I not use the project artifacts at all?
+
+To exclude the project output from modulepath:
+```xml
+  <modulepath>
+    <dependencysets>
+      <dependencyset>
+        <includeoutput>false</includeoutput>
+      </dependencyset>
+    </dependencysets>
+  </modulepath>
+```
+
+$H$H$H <a name="q4" />How to exclude automatic modules?
+
+To exclude automatic modules from modulepath (but it's a default behavior):
+```xml
+  <modulepath>
+    <dependencysets>
+      <dependencyset>
+        <excludeautomatic>true</excludeautomatic>
+      </dependencyset>
+    </dependencysets>
+  </modulepath>
+```

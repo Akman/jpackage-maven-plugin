@@ -1,0 +1,168 @@
+## Velocity treats double hashes as comments, so $H can be used instead
+#set( $H = '#' )
+# Create application installer from the predefined application image
+
+This method creates the application installer from the predefined application
+image created on the previous step.
+
+Supposed the environment variable JPACKAGE_HOME contains the path
+to the JDK home directory containing the required version of jpackage tool.
+
+Define the **appimage** tag with the path to the application image
+as the value created on the previous step.
+
+```xml
+  <project>
+    ...
+    <build>
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <version>${project.version}</version>
+            <configuration>
+
+              <!--
+                Specifies the JDK home path which provides the tool needed.
+                If not specified the jpackage tool executable will be find in
+                the following order:
+              
+                  - user specified JDK home directory by toolchains-plugin
+                  - JDK home directory specified by system variable JAVA_HOME
+                  - system path specified by system variable PATH
+              -->
+              <toolhome>${env.JPACKAGE_HOME}</toolhome>
+              
+              <!--
+                Specifies the location in which generated output files are placed.
+                Default value: ${project.build.directory}/jpackage
+              -->
+              <dest>${project.build.directory}/jpackage</dest>
+              
+              <!--
+                Specifies the installable package name.
+              -->
+              <name>hello</name>
+              
+              <!--
+                Specifies the type of package to
+                create: { PLATFORM | IMAGE | EXE | MSI }.
+                Default value: PLATFORM (a platform dependent default type)
+              -->
+              <type>MSI</type>
+              
+              <!--
+                Specifies version of the application and/or package.
+              -->
+              <appversion>1.0</appversion>
+              
+              <!--
+                Specifies copyright for the application.
+              -->
+              <copyright>Copyright</copyright>
+              
+              <!--
+                Specifies description of the application.
+              -->
+              <description>Description</description>
+              
+              <!--
+                Specifies vendor of the application.
+              -->
+              <vendor>Vendor</vendor>
+              
+              <!--
+                Specifies the location of the predefined application image
+                that is used to build an installable package.
+              -->
+              <appimage>${project.build.directory}/jpackage/hello</appimage>
+              
+              <!--
+                Specifies the location of a properties file that contains
+                list of key, value pairs. The keys "extension", "mime-type",
+                "icon", and "description" can be used to describe the association.
+              -->
+              <fileassociations>${project.basedir}/config/jpackage/associations.properties</fileassociations>
+              
+              <!--
+                Specifies the relative sub-path under the default installation
+                location of the application for Windows, or absolute path of the
+                installation directory of the application for Mac or Linux.
+              -->
+              <installdir>Vendor/Hello</installdir>
+              
+              <!--
+                Specifies the location of a license file.
+              -->
+              <licensefile>${project.basedir}/config/jpackage/LICENSE</licensefile>
+              
+              <!--
+                Specifies the location of a resources directory that override
+                jpackage resources. Icons, template files, and other resources
+                of jpackage can be overridden by adding replacement resources
+                to this directory.
+              -->
+              <resourcedir>${project.basedir}/config/jpackage/resources</resourcedir>
+              
+              <!--
+                Enable adding a dialog to choose a directory in which
+                the product is installed.
+                Default value: false
+              -->
+              <windirchooser>true</windirchooser>
+              
+              <!--
+                Enable adding the application to the system menu.
+                Default value: false
+              -->
+              <winmenu>true</winmenu>
+              
+              <!--
+                Start menu group this application is placed in.
+              -->
+              <winmenugroup>Vendor/Hello</winmenugroup>
+              
+              <!--
+                Enable requesting to perform an install on a per-user basis.
+                Default value: false
+              -->
+              <winperuserinstall>true</winperuserinstall>
+              
+              <!--
+                Enable creating a desktop shortcut for the application.
+                Default value: false
+              -->
+              <winshortcut>true</winshortcut>
+              
+              <!--
+                UUID associated with upgrades for this package.
+              -->
+              <winupgradeuuid>8CF81762-0B19-46A6-875E-1F839A1700D0</winupgradeuuid>
+
+            </configuration>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+      ...
+      <plugins>
+        ...
+          <plugin>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <executions>
+              <execution>
+                <id>jpackage-installer</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>jpackage</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        ...
+      </plugins>
+    </build>
+    ...
+  </project>
+```

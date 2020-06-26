@@ -1,0 +1,67 @@
+#  Copyright (C) 2020 Alexander Kapitman
+#  
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#  
+#    http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+# Branch value equals:
+#   - name of the branch (TRAVIS_BRANCH) for push builds, or builds not
+#     triggered by a pull request
+#   - name of the branch targeted by the pull request (TRAVIS_BRANCH) for
+#     builds triggered by a pull request
+#   - name of the tag (TRAVIS_TAG) for builds triggered by a tag
+#     CAUTION: For tags, git does not store the branch from which a commit
+#     was tagged, so TRAVIS_BRANCH = TRAVIS_TAG
+
+if: branch =~ /^v\d+\.\d+\.\d+(-SNAPSHOT.*)?$/
+
+git:
+
+  # Travis CI can clone repositories to a maximum depth of 50 commits,
+  # which is only really useful if you are performing git operations.
+  # Please note that if you use a depth of 1 and have a queue of jobs,
+  # Travis CI won’t build commits that are in the queue when
+  # you push a new commit.
+  # You can also remove the --depth flag entirely, add depth: false
+  
+  depth: false
+
+  # Travis CI clones repositories without the quiet flag (-q) by default.
+  # Enabling the quiet flag can be useful if you’re trying to avoid
+  # log file size limits or even if you just don’t need to include it.
+  
+  quiet: true
+
+matrix:
+
+  # If some rows in the build matrix are allowed to fail, the build won’t be
+  # marked as finished until they have completed. To mark the build as finished
+  # as soon as possible, add fast_finish: true
+
+  fast_finish: true
+
+  include:
+
+    - os: linux
+      dist: bionic
+      language: java
+      jdk:
+        - openjdk13
+
+install:
+  - /bin/true
+
+script:
+  - mvn -q -B clean install
+
+cache:
+  directories:
+    - $HOME/.m2

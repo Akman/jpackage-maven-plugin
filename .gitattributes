@@ -1,0 +1,13 @@
+* text=auto
+* eol=lf
+
+*.jpeg binary
+*.jpg  binary
+*.ico  binary
+*.gif  binary
+*.png  binary
+
+*.bat  text   eol=crlf
+
+config/* linguist-vendored
+docs/* linguist-documentation

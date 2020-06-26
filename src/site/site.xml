@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2020 Alexander Kapitman
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/DECORATION/1.6.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/DECORATION/1.6.0
+    http://maven.apache.org/xsd/decoration-1.6.0.xsd">
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.9</version>
+  </skin>
+
+  <!--
+  <bannerLeft>
+    <name />
+    <src />
+    <href />
+    <alt />
+    <border />
+    <width />
+    <height />
+    <title />
+  </bannerLeft>
+  -->
+
+  <!--
+  <bannerRight>
+    <src />
+    <name />
+    <alt />
+    <href />
+    <border />
+    <width />
+    <height />
+    <title />
+  </bannerRight>
+  -->
+
+  <!--
+  <poweredBy>
+    <logo name= href= img= position= alt= border= width= height= target= title= />
+  </poweredBy>
+  -->
+
+  <!--
+    The base url to edit Doxia document sources.
+    In general, ${project.scm.url} value should do the job.
+  -->
+  <!--
+  <edit />
+  -->
+
+  <!-- position=left, right, navigation-top, navigation-bottom, bottom, none -->
+  <publishDate format="yyyy-MM-dd" position="none" />
+
+  <!-- left, right, navigation-top, navigation-bottom, bottom, none -->
+  <version position="right"/>
+
+  <!--googleAdSenseClient /-->
+  <!--googleAdSenseSlot /-->
+  <!--googleAnalyticsAccountId /-->
+
+  <!--googleAnalytics>UA-12345...</googleAnalytics-->
+
+  <custom>
+    <fluidoSkin>
+
+      <skipGenerationDate>true</skipGenerationDate>
+      <topBarEnabled>true</topBarEnabled>
+      <sideBarEnabled>true</sideBarEnabled>
+      <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+      <breadcrumbDivider>»</breadcrumbDivider>
+      <navBarStyle>navbar-inverse</navBarStyle>
+      <!--profile>pre-release | sandbox | retired</profile-->
+      <!--topBarContainerStyle>width: 90%;</topBarContainerStyle-->
+      <!--leftColumnClass>span3</leftColumnClass-->
+      <!--bodyColumnClass>span9</bodyColumnClass-->
+      <!--copyrightClass>pull-right</copyrightClass-->
+
+      <gitHub>
+        <projectId>akman/jpackage-maven-plugin</projectId>
+        <!-- left/right -->
+        <ribbonOrientation>right</ribbonOrientation>
+        <!-- red/green/black/darkblue/orange/gray -->
+        <ribbonColor>orange</ribbonColor>
+      </gitHub>
+
+      <!--
+      <topBarIcon>
+        <name />
+        <alt />
+        <src />
+        <href />
+      </topBarIcon>
+      -->
+
+      <!--
+      <googleAnalytics>
+        <anonymizeIp>true/false</anonymizeIp>
+        <forceSSL>true/false</forceSSL>
+      </googleAnalytics>
+      -->
+
+      <!--
+      <googleSearch>
+        <sitesearch />
+      </googleSearch>
+      -->
+
+    </fluidoSkin>
+  </custom>
+
+  <body>
+
+    <!--
+    <head>
+      <![CDATA[<script src="..." type="text/javascript" />]]>
+    </head>
+    -->
+
+    <!--
+    <links>
+      <item name="" href= img= position= alt= border= width= height= target= title= />
+    </links>
+    -->
+
+    <breadcrumbs>
+      <item name="${project.name}" href="index.html"/>
+      <!--
+      <item name= href= img= position= alt= border= width= height= target= title= />
+      -->
+    </breadcrumbs>
+    
+    <!--
+    <menu name= inherit= inheritAsRef= ref= img= alt= position= border= width= height= title= >
+      <item collapse= ref= name= href= img= position= alt= border= width= height= target= title= >
+        <description />
+        <item>
+          ...
+        </item>
+      </item>
+    </menu>
+    -->
+
+    <menu name="Overview">
+      <item name="Introduction" href="index.html"/>
+      <item name="Goals" href="plugin-info.html"/>
+      <item name="Usage" href="usage.html"/>
+      <item name="FAQ" href="faq.html"/>
+    </menu>
+
+    <menu name="Examples">
+      <item name="Create application image from a predefined runtime image"
+          href="examples/from-runtime-image.html"/>
+      <item name="Create application installer from the predefined application image"
+          href="examples/from-application-image.html"/>
+      <item name="Create application installer avoiding any intermediate steps"
+          href="examples/all-in-one.html"/>
+    </menu>
+
+    <!--
+    <menu ref="parent" />
+    <menu ref="modules" />
+    -->
+    <menu ref="reports" />
+
+    <footer>${project.copyright}. All rights reserved.</footer>
+
+  </body>
+
+</project>

@@ -1,0 +1,52 @@
+## Velocity treats double hashes as comments, so $H can be used instead
+#set( $H = '#' )
+# Usage
+
+Add the plugin to your pom:
+
+```xml
+  <project>
+    ...
+    <build>
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <version>${project.version}</version>
+            <configuration>
+
+              <!-- put your configurations here -->
+
+            </configuration>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+      ...
+      <plugins>
+        ...
+          <plugin>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>jpackage</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        ...
+      </plugins>
+    </build>
+    ...
+  </project>
+```
+
+You can start the plugin manually after build your project (as usual)
+up to verify phase.
+
+```console
+mvn verify jpackage:jpackage
+```
