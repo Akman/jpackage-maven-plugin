@@ -7,7 +7,7 @@ the jlink tool to create an application runtime image and the two subsequent
 runs of the jpackage tool to create the application image first and then
 to create the application installer.
 
-Supposed the environment variable JPACKAGE_HOME contains the path
+Supposed the environment variable **JPACKAGE_HOME** contains the path
 to the JDK home directory containing the required version of jpackage tool.
 
 Define the **modulepath** and **addmodules** tags.

@@ -5,7 +5,7 @@
 This method creates the application image from a predefined runtime image
 created by the jlink tool.
 
-Supposed the environment variable JPACKAGE_HOME contains the path
+Supposed the environment variable **JPACKAGE_HOME** contains the path
 to the JDK home directory containing the required version of jpackage tool.
 
 Define the **runtimeimage** tag with the path to the runtime image

@@ -16,11 +16,9 @@
 
 package ru.akman.maven.plugins.jpackage;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -138,6 +136,12 @@ public class JPackageMojo extends BaseToolMojo {
    * The char that will used to wrap an option string.
    */
   private static final char WRAP_CHAR = '\'';
+
+  /**
+   * Error message pattern for unability to resolve file path.
+   */
+  private static final String ERROR_RESOLVE =
+      "Error: Unable to resolve file path for {0} [{1}]";
 
   /**
    * List of temporary files.
@@ -647,7 +651,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private String macpackageidentifier;
 
-  /*
+  /**
    * Name of the application as it appears in the Menu Bar.
    * This can be different from the application name.
    * This name must be less than 16 characters long and be suitable for
@@ -659,7 +663,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private String macpackagename;
 
-  /*
+  /**
    * When signing the application package, this value is prefixed
    * to all components that need to be signed that don't have
    * an existing package identifier.
@@ -670,7 +674,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private String macpackagesigningprefix;
 
-  /*
+  /**
    * Request that the package be signed.
    *
    * <p>The jpackage CLI is: <code>--mac-sign</code></p>
@@ -678,7 +682,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private boolean macsign;
 
-  /*
+  /**
    * Path of the keychain to search for the signing identity
    * (absolute path or relative to the current directory).
    * If not specified, the standard keychains are used.
@@ -690,7 +694,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private File macsigningkeychain;
 
-  /*
+  /**
    * Team name portion in Apple signing identities' names.
    * For example "Developer ID Application: ".
    *
@@ -704,7 +708,7 @@ public class JPackageMojo extends BaseToolMojo {
   // installable package (Linux)
 
 
-  /*
+  /**
    * Name for Linux package, defaults to the application name.
    *
    * <p>The jpackage CLI is: <code>--linux-package-name name</code></p>
@@ -712,7 +716,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private String linuxpackagename;
 
-  /*
+  /**
    * Maintainer for .deb package.
    *
    * <p>The jpackage CLI is: <code>--linux-deb-maintainer email</code></p>
@@ -720,7 +724,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private String linuxdebmaintainer;
 
-  /*
+  /**
    * Menu group this application is placed in.
    *
    * <p>The jpackage CLI is: <code>--linux-menu-group name</code></p>
@@ -728,7 +732,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private String linuxmenugroup;
 
-  /*
+  /**
    * Required packages or capabilities for the application.
    *
    * <p>The jpackage CLI is: <code>--linux-package-deps</code></p>
@@ -736,16 +740,16 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private boolean linuxpackagedeps;
 
-  /*
-   * Type of the license ("License: <name>" of the RPM .spec).
+  /**
+   * Type of the license ("License: name" of the RPM .spec).
    *
    * <p>The jpackage CLI is: <code>--linux-rpm-license-type name</code></p>
    */
   @Parameter
   private String linuxrpmlicensetype;
 
-  /*
-   * Release value of the RPM <name>.spec file or Debian revision value
+  /**
+   * Release value of the RPM name.spec file or Debian revision value
    * of the DEB control file.
    *
    * <p>The jpackage CLI is: <code>--linux-app-release name</code></p>
@@ -753,8 +757,8 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private String linuxapprelease;
 
-  /*
-   * Group value of the RPM <name>.spec file or Section value
+  /**
+   * Group value of the RPM name.spec file or Section value
    * of DEB control file.
    *
    * <p>The jpackage CLI is: <code>--linux-app-category name</code></p>
@@ -762,7 +766,7 @@ public class JPackageMojo extends BaseToolMojo {
   @Parameter
   private String linuxappcategory;
 
-  /*
+  /**
    * Creates a shortcut for the application.
    *
    * <p>The jpackage CLI is: <code>--linux-shortcut</code></p>
@@ -787,7 +791,7 @@ public class JPackageMojo extends BaseToolMojo {
       opt.createArg().setValue(dest.getCanonicalPath());
     } catch (IOException ex) {
       throw new MojoExecutionException(MessageFormat.format(
-          "Error: Unable to resolve file path for {0} [{1}]",
+          ERROR_RESOLVE,
           "--dest",
           dest.toString()), ex);
     }
@@ -799,7 +803,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(temp.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--temp",
             temp.toString()), ex);
       }
@@ -870,7 +874,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(icon.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--icon",
             icon.toString()), ex);
       }
@@ -883,7 +887,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(input.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--input",
             input.toString()), ex);
       }
@@ -896,7 +900,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(runtimeimage.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--runtime-image",
             runtimeimage.toString()), ex);
       }
@@ -949,7 +953,7 @@ public class JPackageMojo extends BaseToolMojo {
             opt.createArg().setValue(name + "=" + file.getCanonicalPath());
           } catch (IOException ex) {
             throw new MojoExecutionException(MessageFormat.format(
-                "Error: Unable to resolve file path for {0} [{1}]",
+                ERROR_RESOLVE,
                 "--add-launcher",
                 file.toString()), ex);
           }
@@ -969,7 +973,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(appimage.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--app-image",
             appimage.toString()), ex);
       }
@@ -982,7 +986,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(fileassociations.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--file-associations",
             fileassociations.toString()), ex);
       }
@@ -1002,7 +1006,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(licensefile.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--license-file",
             licensefile.toString()), ex);
       }
@@ -1015,7 +1019,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(resourcedir.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--resource-dir",
             resourcedir.toString()), ex);
       }
@@ -1088,7 +1092,7 @@ public class JPackageMojo extends BaseToolMojo {
         opt.createArg().setValue(macsigningkeychain.getCanonicalPath());
       } catch (IOException ex) {
         throw new MojoExecutionException(MessageFormat.format(
-            "Error: Unable to resolve file path for {0} [{1}]",
+            ERROR_RESOLVE,
             "--mac-signing-keychain",
             macsigningkeychain.toString()), ex);
       }
@@ -1187,18 +1191,17 @@ public class JPackageMojo extends BaseToolMojo {
           name), ex);
     }
     // save properties to the temporary file
-    try (final OutputStream os = new FileOutputStream(file);
-        final OutputStreamWriter osw =
-            new OutputStreamWriter(os, getCharset())) {
-      props.store(osw, null);
+    try (BufferedWriter bw =
+        Files.newBufferedWriter(file.toPath(), getCharset())) {
+      props.store(bw, null);
     } catch (IOException ex) {
       throw new MojoExecutionException(MessageFormat.format(
           "Error: Unable to write temporary file for launcher: [{0}]",
           name), ex);
     }
     if (getLog().isDebugEnabled()) {
-      getLog().debug(System.lineSeparator()
-          + MessageFormat.format("Found additional launcher: [{0}]", name)
+      getLog().debug(MessageFormat.format(
+          "Found additional launcher: [{0}]", name)
           + System.lineSeparator()
           + props.toString());
     }
@@ -1807,7 +1810,9 @@ public class JPackageMojo extends BaseToolMojo {
     init(TOOL_NAME, toolhome, TOOL_HOME_BIN); // from BaseToolMojo
 
     // Check version
-    if (!getToolJavaVersion().atLeast(JavaVersion.JAVA_9)) {
+    final JavaVersion toolJavaVersion = getToolJavaVersion();
+    if (toolJavaVersion == null
+        || !toolJavaVersion.atLeast(JavaVersion.JAVA_9)) {
       throw new MojoExecutionException(MessageFormat.format(
           "Error: At least {0} is required to use [{1}]", JavaVersion.JAVA_9,
           TOOL_NAME));
@@ -1832,9 +1837,9 @@ public class JPackageMojo extends BaseToolMojo {
     // Resolve and fetch project dependencies
     projectDependencies = resolveDependencies();
     mainModuleDescriptor = fetchMainModuleDescriptor();
-    List<File> classpathElements = fetchClasspathElements();
-    List<File> modulepathElements = fetchModulepathElements();
-    Map<File, String> pathExceptions = fetchPathExceptions();
+    // final List<File> classpathElements = fetchClasspathElements();
+    // final List<File> modulepathElements = fetchModulepathElements();
+    final Map<File, String> pathExceptions = fetchPathExceptions();
     if (!pathExceptions.isEmpty() && getLog().isWarnEnabled()) {
       getLog().warn("Found path exceptions: " + pathExceptions.size()
           + System.lineSeparator()

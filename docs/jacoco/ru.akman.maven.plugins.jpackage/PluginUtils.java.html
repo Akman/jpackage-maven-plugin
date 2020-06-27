@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PluginUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JPackage Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">ru.akman.maven.plugins.jpackage</a> &gt; <span class="el_source">PluginUtils.java</span></div><h1>PluginUtils.java</h1><pre class="source lang-java linenums">/*
+  Copyright (C) 2020 Alexander Kapitman
+  
+  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+package ru.akman.maven.plugins.jpackage;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.shared.model.fileset.FileSet;
+import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
+
+/**
+ * Helper class for utilities.
+ */
+public final class PluginUtils {
+
+  /**
+   * Private constructor.
+   */
+<span class="nc" id="L38">  private PluginUtils() {</span>
+    // not called
+<span class="nc" id="L40">    throw new UnsupportedOperationException();</span>
+  }
+
+  /**
+   * Wraps an option string with a string if that one is missing
+   * from the start or end of the given option string.
+   * A new string will not be created if the given option string is
+   * already wrapped.
+   *
+   * @param str the option string to be wrapped, may be null
+   * @param wrapWith the char that will wrap the given string
+   *
+   * @return the wrapped option string
+   */
+  public static String wrapOpt(final String str, final char wrapWith) {
+<span class="nc bnc" id="L55" title="All 2 branches missed.">    return StringUtils.isBlank(str)</span>
+<span class="nc" id="L56">        ? &quot;&quot;</span>
+<span class="nc" id="L57">        : StringUtils.wrapIfMissing(StringUtils.stripToEmpty(str), wrapWith);</span>
+  }
+
+  /**
+   * Get the cause message for throwable.
+   *
+   * @param throwable the throwable
+   *
+   * @return the cause error message
+   */
+  public static String getThrowableCause(final Throwable throwable) {
+<span class="nc bnc" id="L68" title="All 2 branches missed.">    return throwable.getCause() == null</span>
+<span class="nc" id="L69">        ? throwable.getMessage()</span>
+<span class="nc" id="L70">        : getThrowableCause(throwable.getCause());</span>
+  }
+
+  /**
+   * Fix base directory of the fileset by resolving it
+   * relative to the specified base directory.
+   *
+   * @param baseDir base directory
+   * @param fileSet fileset
+   *
+   * @return normalized fileset dir
+   *
+   * @throws IOException if error occurred while resolving a canonical path
+   */
+  public static File normalizeFileSetBaseDir(final File baseDir,
+      final FileSet fileSet) throws IOException {
+<span class="fc" id="L86">    String dir = fileSet.getDirectory();</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">    if (dir == null) {</span>
+<span class="nc" id="L88">      dir = baseDir.getCanonicalPath();</span>
+    }
+<span class="fc" id="L90">    File fileSetDir = new File(dir);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    if (!fileSetDir.isAbsolute()) {</span>
+<span class="fc" id="L92">      fileSetDir = new File(baseDir, dir);</span>
+    }
+<span class="fc" id="L94">    fileSet.setDirectory(fileSetDir.getCanonicalPath());</span>
+<span class="fc" id="L95">    return fileSetDir;</span>
+  }
+
+  /**
+   * Get debug info about artifact set.
+   *
+   * @param artifacts set of project artifacts
+   *
+   * @return formatted string contains info about the artifacts
+   */
+  public static String getArtifactSetDebugInfo(final Set&lt;Artifact&gt; artifacts) {
+<span class="nc" id="L106">    return new StringBuilder(&quot;ARTIFACTS&quot;)</span>
+<span class="nc" id="L107">        .append(System.lineSeparator())</span>
+<span class="nc" id="L108">        .append(artifacts.stream()</span>
+<span class="nc" id="L109">            .filter(Objects::nonNull)</span>
+<span class="nc" id="L110">            .map(PluginUtils::getArtifactDebugInfo)</span>
+<span class="nc" id="L111">            .collect(Collectors.joining(System.lineSeparator())))</span>
+<span class="nc" id="L112">        .append(System.lineSeparator())</span>
+<span class="nc" id="L113">        .toString();</span>
+  }
+
+  /**
+   * Get debug info about the artifact.
+   *
+   * @param artifact the artifact
+   *
+   * @return formatted string contains info about the artifact
+   */
+  public static String getArtifactDebugInfo(final Artifact artifact) {
+<span class="nc" id="L124">    return new StringBuilder(System.lineSeparator())</span>
+<span class="nc" id="L125">        .append(&quot;[ &quot;)</span>
+<span class="nc" id="L126">        .append(artifact.getScope())</span>
+<span class="nc" id="L127">        .append(&quot; ] &quot;)</span>
+<span class="nc" id="L128">        .append(artifact.getGroupId())</span>
+<span class="nc" id="L129">        .append(':')</span>
+<span class="nc" id="L130">        .append(artifact.getArtifactId())</span>
+<span class="nc" id="L131">        .append(':')</span>
+<span class="nc" id="L132">        .append(artifact.getVersion())</span>
+<span class="nc" id="L133">        .append(&quot; - &quot;)</span>
+<span class="nc" id="L134">        .append(artifact.getFile().getName())</span>
+<span class="nc" id="L135">        .append(System.lineSeparator())</span>
+<span class="nc" id="L136">        .append(&quot;  type: &quot;)</span>
+<span class="nc" id="L137">        .append(artifact.getType())</span>
+<span class="nc" id="L138">        .append(System.lineSeparator())</span>
+<span class="nc" id="L139">        .append(&quot;  classifier: &quot;)</span>
+<span class="nc" id="L140">        .append(artifact.getClassifier())</span>
+<span class="nc" id="L141">        .append(System.lineSeparator())</span>
+<span class="nc" id="L142">        .append(&quot;  optional: &quot;)</span>
+<span class="nc" id="L143">        .append(artifact.isOptional())</span>
+<span class="nc" id="L144">        .append(System.lineSeparator())</span>
+<span class="nc" id="L145">        .append(&quot;  release: &quot;)</span>
+<span class="nc" id="L146">        .append(artifact.isRelease())</span>
+<span class="nc" id="L147">        .append(System.lineSeparator())</span>
+<span class="nc" id="L148">        .append(&quot;  snapshot: &quot;)</span>
+<span class="nc" id="L149">        .append(artifact.isSnapshot())</span>
+<span class="nc" id="L150">        .append(System.lineSeparator())</span>
+<span class="nc" id="L151">        .append(&quot;  resolved: &quot;)</span>
+<span class="nc" id="L152">        .append(artifact.isResolved())</span>
+<span class="nc" id="L153">        .toString();</span>
+  }
+
+  /**
+   * Get debug info about path elements.
+   *
+   * @param title title
+   * @param pathelements list of path elements
+   *
+   * @return formatted string contains info about the path elements
+   */
+  public static String getPathElementsDebugInfo(final String title,
+      final List&lt;File&gt; pathelements) {
+<span class="nc" id="L166">    return new StringBuilder(System.lineSeparator())</span>
+<span class="nc" id="L167">        .append(title)</span>
+<span class="nc" id="L168">        .append(System.lineSeparator())</span>
+<span class="nc" id="L169">        .append(pathelements.stream()</span>
+<span class="nc" id="L170">            .filter(Objects::nonNull)</span>
+<span class="nc" id="L171">            .map(file -&gt; file.toString())</span>
+<span class="nc" id="L172">            .collect(Collectors.joining(System.lineSeparator())))</span>
+<span class="nc" id="L173">        .toString();</span>
+  }
+
+  /**
+   * Get debug info about a fileset.
+   *
+   * @param title title
+   * @param fileSet fileset
+   * @param data fileset data
+   *
+   * @return formatted string contains info about the fileset
+   */
+  public static String getFileSetDebugInfo(final String title,
+      final FileSet fileSet, final String data) {
+<span class="nc" id="L187">    return new StringBuilder(System.lineSeparator())</span>
+<span class="nc" id="L188">        .append(title)</span>
+<span class="nc" id="L189">        .append(System.lineSeparator())</span>
+<span class="nc" id="L190">        .append(&quot;directory: &quot;)</span>
+<span class="nc" id="L191">        .append(fileSet.getDirectory())</span>
+<span class="nc" id="L192">        .append(System.lineSeparator())</span>
+<span class="nc" id="L193">        .append(&quot;followSymlinks: &quot;)</span>
+<span class="nc" id="L194">        .append(fileSet.isFollowSymlinks())</span>
+<span class="nc" id="L195">        .append(System.lineSeparator())</span>
+<span class="nc" id="L196">        .append(&quot;includes:&quot;)</span>
+<span class="nc" id="L197">        .append(System.lineSeparator())</span>
+<span class="nc" id="L198">        .append(fileSet.getIncludes().stream()</span>
+<span class="nc" id="L199">            .collect(Collectors.joining(System.lineSeparator())))</span>
+<span class="nc" id="L200">        .append(System.lineSeparator())</span>
+<span class="nc" id="L201">        .append(&quot;excludes:&quot;)</span>
+<span class="nc" id="L202">        .append(System.lineSeparator())</span>
+<span class="nc" id="L203">        .append(fileSet.getExcludes().stream()</span>
+<span class="nc" id="L204">            .collect(Collectors.joining(System.lineSeparator())))</span>
+<span class="nc" id="L205">        .append(System.lineSeparator())</span>
+<span class="nc" id="L206">        .append(&quot;data:&quot;)</span>
+<span class="nc" id="L207">        .append(System.lineSeparator())</span>
+<span class="nc" id="L208">        .append(data)</span>
+<span class="nc" id="L209">        .toString();</span>
+  }
+
+  /**
+   * Get debug info about a dependencyset.
+   *
+   * @param title title
+   * @param depSet dependencyset
+   * @param data dependencyset data
+   *
+   * @return formatted string contains info about the dependencyset
+   */
+  public static String getDependencySetDebugInfo(final String title,
+      final DependencySet depSet, final String data) {
+<span class="nc" id="L223">    final StringBuilder result = new StringBuilder(System.lineSeparator());</span>
+<span class="nc" id="L224">    result</span>
+<span class="nc" id="L225">        .append(title)</span>
+<span class="nc" id="L226">        .append(System.lineSeparator())</span>
+<span class="nc" id="L227">        .append(&quot;includeoutput: &quot;)</span>
+<span class="nc" id="L228">        .append(depSet.isOutputIncluded())</span>
+<span class="nc" id="L229">        .append(System.lineSeparator())</span>
+<span class="nc" id="L230">        .append(&quot;excludeautomatic: &quot;)</span>
+<span class="nc" id="L231">        .append(depSet.isAutomaticExcluded())</span>
+<span class="nc" id="L232">        .append(System.lineSeparator())</span>
+<span class="nc" id="L233">        .append(&quot;includes:&quot;);</span>
+<span class="nc" id="L234">    final List&lt;String&gt; includes = depSet.getIncludes();</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">    if (includes != null) {</span>
+<span class="nc" id="L236">      result</span>
+<span class="nc" id="L237">          .append(System.lineSeparator())</span>
+<span class="nc" id="L238">          .append(includes.stream()</span>
+<span class="nc" id="L239">              .collect(Collectors.joining(System.lineSeparator())));</span>
+    }
+<span class="nc" id="L241">    result</span>
+<span class="nc" id="L242">        .append(System.lineSeparator())</span>
+<span class="nc" id="L243">        .append(&quot;includenames:&quot;);</span>
+<span class="nc" id="L244">    final List&lt;String&gt; includenames = depSet.getIncludeNames();</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">    if (includenames != null) {</span>
+<span class="nc" id="L246">      result</span>
+<span class="nc" id="L247">          .append(System.lineSeparator())</span>
+<span class="nc" id="L248">          .append(includenames.stream()</span>
+<span class="nc" id="L249">              .collect(Collectors.joining(System.lineSeparator())));</span>
+    }
+<span class="nc" id="L251">    result</span>
+<span class="nc" id="L252">        .append(System.lineSeparator())</span>
+<span class="nc" id="L253">        .append(&quot;excludes:&quot;);</span>
+<span class="nc" id="L254">    final List&lt;String&gt; excludes = depSet.getExcludes();</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">    if (excludes != null) {</span>
+<span class="nc" id="L256">      result  </span>
+<span class="nc" id="L257">          .append(System.lineSeparator())</span>
+<span class="nc" id="L258">          .append(depSet.getExcludes().stream()</span>
+<span class="nc" id="L259">              .collect(Collectors.joining(System.lineSeparator())));</span>
+    }
+<span class="nc" id="L261">    result</span>
+<span class="nc" id="L262">        .append(System.lineSeparator())</span>
+<span class="nc" id="L263">        .append(&quot;excludenames:&quot;);</span>
+<span class="nc" id="L264">    final List&lt;String&gt; excludenames = depSet.getExcludeNames();</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">    if (excludenames != null) {</span>
+<span class="nc" id="L266">      result  </span>
+<span class="nc" id="L267">          .append(System.lineSeparator())</span>
+<span class="nc" id="L268">          .append(depSet.getExcludeNames().stream()</span>
+<span class="nc" id="L269">              .collect(Collectors.joining(System.lineSeparator())));</span>
+    }
+<span class="nc" id="L271">    result</span>
+<span class="nc" id="L272">        .append(System.lineSeparator())</span>
+<span class="nc" id="L273">        .append(&quot;data:&quot;)</span>
+<span class="nc" id="L274">        .append(System.lineSeparator())</span>
+<span class="nc" id="L275">        .append(data);</span>
+<span class="nc" id="L276">    return result.toString();</span>
+  }
+
+  /**
+   * Get debug info about a dependency.
+   *
+   * @param file the dependency file
+   * @param descriptor the dependency descriptor
+   * @param isIncluded will the dependency be included
+   *
+   * @return formatted string contains info about the dependency
+   */
+  public static String getDependencyDebugInfo(final File file,
+      final JavaModuleDescriptor descriptor, final boolean isIncluded) {
+<span class="nc" id="L290">    final StringBuilder result = new StringBuilder()</span>
+<span class="nc" id="L291">        .append(System.lineSeparator())</span>
+<span class="nc" id="L292">        .append(&quot;included: &quot;)</span>
+<span class="nc" id="L293">        .append(isIncluded)</span>
+<span class="nc" id="L294">        .append(System.lineSeparator())</span>
+<span class="nc" id="L295">        .append(&quot;file: &quot;)</span>
+<span class="nc" id="L296">        .append(file.getName())</span>
+<span class="nc" id="L297">        .append(System.lineSeparator())</span>
+<span class="nc" id="L298">        .append(&quot;path: &quot;)</span>
+<span class="nc" id="L299">        .append(file.toString());</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">    if (descriptor != null) {</span>
+<span class="nc" id="L301">      result</span>
+<span class="nc" id="L302">          .append(System.lineSeparator())</span>
+<span class="nc" id="L303">          .append(&quot;name: &quot;)</span>
+<span class="nc" id="L304">          .append(descriptor.name())</span>
+<span class="nc" id="L305">          .append(System.lineSeparator())</span>
+<span class="nc" id="L306">          .append(&quot;automatic: &quot;)</span>
+<span class="nc" id="L307">          .append(descriptor.isAutomatic())</span>
+<span class="nc" id="L308">          .append(System.lineSeparator())</span>
+<span class="nc" id="L309">          .append(&quot;requires: &quot;)</span>
+<span class="nc" id="L310">          .append(System.lineSeparator())</span>
+<span class="nc" id="L311">          .append(descriptor.requires().stream()</span>
+<span class="nc" id="L312">              .filter(Objects::nonNull)</span>
+<span class="nc" id="L313">              .map(requires -&gt; requires.name() + &quot; : &quot;</span>
+<span class="nc" id="L314">                  + requires.modifiers().stream()</span>
+<span class="nc" id="L315">                      .filter(Objects::nonNull)</span>
+<span class="nc" id="L316">                      .map(mod -&gt; mod.toString())</span>
+<span class="nc" id="L317">                      .collect(Collectors.joining(&quot;, &quot;, &quot;{ &quot;, &quot; }&quot;)))</span>
+<span class="nc" id="L318">              .collect(Collectors.joining(System.lineSeparator())))</span>
+<span class="nc" id="L319">          .append(System.lineSeparator())</span>
+<span class="nc" id="L320">          .append(&quot;exports: &quot;)</span>
+<span class="nc" id="L321">          .append(System.lineSeparator())</span>
+<span class="nc" id="L322">          .append(descriptor.exports().stream()</span>
+<span class="nc" id="L323">              .filter(Objects::nonNull)</span>
+<span class="nc" id="L324">              .map(exports -&gt; exports.source() + &quot; : &quot;</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                  + (exports.targets() == null ? &quot;{}&quot; :</span>
+<span class="nc" id="L326">                      exports.targets().stream()</span>
+<span class="nc" id="L327">                          .filter(Objects::nonNull)</span>
+<span class="nc" id="L328">                          .collect(Collectors.joining(&quot;, &quot;, &quot;{ &quot;, &quot; }&quot;))))</span>
+<span class="nc" id="L329">              .collect(Collectors.joining(System.lineSeparator())))</span>
+<span class="nc" id="L330">          .append(System.lineSeparator())</span>
+<span class="nc" id="L331">          .append(&quot;provides: &quot;)</span>
+<span class="nc" id="L332">          .append(System.lineSeparator())</span>
+<span class="nc" id="L333">          .append(descriptor.provides().stream()</span>
+<span class="nc" id="L334">              .filter(Objects::nonNull)</span>
+<span class="nc" id="L335">              .map(provides -&gt; provides.service() + &quot; : &quot;</span>
+<span class="nc" id="L336">                  + provides.providers().stream()</span>
+<span class="nc" id="L337">                      .filter(Objects::nonNull)</span>
+<span class="nc" id="L338">                      .collect(Collectors.joining(&quot;, &quot;, &quot;{ &quot;, &quot; }&quot;)))</span>
+<span class="nc" id="L339">              .collect(Collectors.joining(System.lineSeparator())))</span>
+<span class="nc" id="L340">          .append(System.lineSeparator())</span>
+<span class="nc" id="L341">          .append(&quot;uses: &quot;)</span>
+<span class="nc" id="L342">          .append(descriptor.uses().stream()</span>
+<span class="nc" id="L343">                .filter(Objects::nonNull)</span>
+<span class="nc" id="L344">                .collect(Collectors.joining(&quot;, &quot;, &quot;{ &quot;, &quot; }&quot;)));</span>
+    }
+<span class="nc" id="L346">    return result.toString();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommandLineBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JPackage Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">ru.akman.maven.plugins</a> &gt; <span class="el_source">CommandLineBuilder.java</span></div><h1>CommandLineBuilder.java</h1><pre class="source lang-java linenums">/*
+  Copyright (C) 2020 Alexander Kapitman
+  
+  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+package ru.akman.maven.plugins;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.codehaus.plexus.util.cli.Arg;
+import org.codehaus.plexus.util.cli.Commandline;
+
+/**
+ * CommandLine builder is a wrapper added group of agruments to an option.
+ */
+public class CommandLineBuilder {
+
+  /**
+   * Building command line.
+   */
+  private final Commandline cmdLine;
+
+  /**
+   * List of command line options.
+   */
+  private final List&lt;CommandLineOption&gt; options;
+
+  /**
+   * Default constructor.
+   */
+<span class="nc" id="L43">  public CommandLineBuilder() {</span>
+<span class="nc" id="L44">    cmdLine = new Commandline();</span>
+<span class="nc" id="L45">    options = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L46">  }</span>
+
+  /**
+   * Set executable.
+   *
+   * @param executable the executable path
+   */
+  public void setExecutable(final String executable) {
+<span class="nc" id="L54">    cmdLine.setExecutable(executable);</span>
+<span class="nc" id="L55">  }</span>
+
+  /**
+   * Create a new option (group of arguments).
+   *
+   * @return created empty option
+   */
+  public CommandLineOption createOpt() {
+<span class="nc" id="L63">    final CommandLineOption opt = new CommandLineOption(cmdLine);</span>
+<span class="nc" id="L64">    options.add(opt);</span>
+<span class="nc" id="L65">    return opt;</span>
+  }
+
+  /**
+   * Create a new agrument and a new option for it, then
+   * add created argument to this option.
+   *
+   * @return created option with added argument
+   */
+  public Arg createArg() {
+<span class="nc" id="L75">    return createOpt().createArg();</span>
+  }
+
+  /**
+   * Build command line.
+   *
+   * @return builded command line
+   */
+  public Commandline buildCommandLine() {
+<span class="nc" id="L84">    return cmdLine;</span>
+  }
+
+  /**
+   * Build list of options.
+   *
+   * @return builded option list
+   */
+  public List&lt;String&gt; buildOptionList() {
+<span class="nc" id="L93">    return options.stream()</span>
+<span class="nc" id="L94">        .map(opt -&gt; opt.toString())</span>
+<span class="nc" id="L95">        .collect(Collectors.toList());</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

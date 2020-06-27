@@ -16,12 +16,11 @@
 
 package ru.akman.maven.plugins.jpackage;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
@@ -269,14 +268,12 @@ public class Launcher {
    *
    * @throws IOException if IO errors occured
    */
-  public Properties getProperties(Charset charset) throws IOException {
+  public Properties getProperties(final Charset charset) throws IOException {
     final Properties props = new Properties();
     if (file != null) {
-      try (final InputStream is = new FileInputStream(file);
-          final InputStreamReader isr = new InputStreamReader(is, charset)) {
-        props.load(isr);
-      } catch (IOException ex) {
-        throw ex;
+      try (BufferedReader br =
+          Files.newBufferedReader(file.toPath(), charset)) {
+        props.load(br);
       }
     }
     if (!StringUtils.isBlank(module)) {

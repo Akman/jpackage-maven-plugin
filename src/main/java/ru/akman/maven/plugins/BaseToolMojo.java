@@ -541,15 +541,11 @@ public abstract class BaseToolMojo extends AbstractMojo {
     final Commandline cmdLine = new Commandline();
     cmdLine.setExecutable(executablePath.toString());
     cmdLine.createArg().setValue(VERSION_OPTION);
-    final CommandLineUtils.StringStreamConsumer err =
-        new CommandLineUtils.StringStreamConsumer();
     final CommandLineUtils.StringStreamConsumer out =
         new CommandLineUtils.StringStreamConsumer();
-    final int exitCode =
-        CommandLineUtils.executeCommandLine(cmdLine, out, err);
-    logCommandLineExecution(cmdLine, exitCode, out.getOutput(),
-        err.getOutput());
-    return exitCode == 0
+    final CommandLineUtils.StringStreamConsumer err =
+        new CommandLineUtils.StringStreamConsumer();
+    return execCmdLine(cmdLine, out, err) == 0
         ? StringUtils.stripToEmpty(out.getOutput())
         : null;
   }
@@ -562,14 +558,11 @@ public abstract class BaseToolMojo extends AbstractMojo {
    * @return the corresponding Java version matching the tool version
    */
   private JavaVersion getCorrespondingJavaVersion(final String version) {
-    if (version == null) {
-      throw new IllegalArgumentException();
-    }
-    final Matcher versionMatcher = Pattern.compile(VERSION_PATTERN)
-        .matcher(version);
     JavaVersion resolvedVersion = null;
-    if (versionMatcher.matches()) {
-      try {
+    if (version != null) {
+      final Matcher versionMatcher = Pattern.compile(VERSION_PATTERN)
+          .matcher(version);
+      if (versionMatcher.matches()) {
         // always present
         final String majorVersionPart = versionMatcher.group(1);
         final int majorVersion = Integer.parseInt(majorVersionPart);
@@ -592,15 +585,9 @@ public abstract class BaseToolMojo extends AbstractMojo {
               && minorVersion == ANDROID_MINOR) {
             resolvedVersion = JavaVersion.valueOf("JAVA_" + majorVersion
                 + "_" + minorVersion);
-          } else {
-            throw new IllegalArgumentException();
           }
         }
-      } catch (NumberFormatException ex) {
-        throw new IllegalArgumentException();
       }
-    } else {
-      throw new IllegalArgumentException();
     }
     return resolvedVersion;
   }
@@ -813,16 +800,38 @@ public abstract class BaseToolMojo extends AbstractMojo {
    */
   protected int execCmdLine(final Commandline cmdLine)
       throws CommandLineException {
+    return execCmdLine(cmdLine, null, null);
+  }
+
+  /**
+   * Execute command line with defined standard output/error streams.
+   *
+   * @param cmdLine command line
+   * @param out standard output, can be null
+   * @param err standard error, can be null
+   *
+   * @return exit code
+   *
+   * @throws CommandLineException if any errors occurred while processing
+   *                              command line
+   */
+  protected int execCmdLine(final Commandline cmdLine,
+      final CommandLineUtils.StringStreamConsumer out,
+      final CommandLineUtils.StringStreamConsumer err)
+      throws CommandLineException {
     if (getLog().isDebugEnabled()) {
       getLog().debug(CommandLineUtils.toString(cmdLine.getCommandline()));
     }
-    final CommandLineUtils.StringStreamConsumer err =
-        new CommandLineUtils.StringStreamConsumer();
-    final CommandLineUtils.StringStreamConsumer out =
-        new CommandLineUtils.StringStreamConsumer();
-    final int exitCode = CommandLineUtils.executeCommandLine(cmdLine, out, err);
-    logCommandLineExecution(cmdLine, exitCode, out.getOutput(),
-        err.getOutput());
+    final CommandLineUtils.StringStreamConsumer stdout = out == null
+        ? new CommandLineUtils.StringStreamConsumer()
+        : out;
+    final CommandLineUtils.StringStreamConsumer stderr = err == null
+        ? new CommandLineUtils.StringStreamConsumer()
+        : err;
+    final int exitCode =
+        CommandLineUtils.executeCommandLine(cmdLine, stdout, err);
+    logCommandLineExecution(cmdLine, exitCode, stdout.getOutput(),
+        stderr.getOutput());
     return exitCode;
   }
 
@@ -950,18 +959,18 @@ public abstract class BaseToolMojo extends AbstractMojo {
     }
 
     // Obtain the corresponding java version matching the tool version
-    try {
-      toolJavaVersion = getCorrespondingJavaVersion(toolVersion);
-      if (getLog().isInfoEnabled()) {
-        getLog().info(MessageFormat.format(
-            "Version (corresponding java version) of [{0}]: {1}", toolName,
-            toolJavaVersion));
-      }
-    } catch (IllegalArgumentException ex) {
+    toolJavaVersion = getCorrespondingJavaVersion(toolVersion);
+    if (toolJavaVersion == null) {
       if (getLog().isWarnEnabled()) {
         getLog().warn(MessageFormat.format(
             "Unable to resolve corresponding java version of [{0}]",
             toolName));
+      }
+    } else {
+      if (getLog().isInfoEnabled()) {
+        getLog().info(MessageFormat.format(
+            "Version (corresponding java version) of [{0}]: {1}", toolName,
+            toolJavaVersion));
       }
     }
 

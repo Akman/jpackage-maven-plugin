@@ -5,7 +5,7 @@
 This method creates the application installer from the predefined application
 image created on the previous step.
 
-Supposed the environment variable JPACKAGE_HOME contains the path
+Supposed the environment variable **JPACKAGE_HOME** contains the path
 to the JDK home directory containing the required version of jpackage tool.
 
 Define the **appimage** tag with the path to the application image

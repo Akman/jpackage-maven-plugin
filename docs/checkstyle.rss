@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>JPackage Maven Plugin - Checkstyle report</title>
+    <link>https://github.com/akman/jpackage-maven-plugin</link>
+    <description>JPackage Maven Plugin - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2020</copyright>
+    <item>
+      <title>File: 41,
+             Errors: 0,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://github.com/akman/jpackage-maven-plugin/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.mac.resources.hello.properties">src/it/projects/all-in-one/config/jpackage/mac/resources/hello.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.linux.resources.hello.properties">src/it/projects/step-by-step/config/jpackage/linux/resources/hello.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.windows.associations.properties">src/it/projects/step-by-step/config/jpackage/windows/associations.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.CommandLineOption.java">ru/akman/maven/plugins/CommandLineOption.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#project.properties">project.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.linux.associations.properties">src/it/projects/all-in-one/config/jpackage/linux/associations.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.mac.associations.properties">src/it/projects/all-in-one/config/jpackage/mac/associations.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.TestUtils.java">ru/akman/maven/plugins/TestUtils.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.linux.resources.hello-cli.launcher.properties">src/it/projects/all-in-one/config/jpackage/linux/resources/hello-cli.launcher.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.windows.resources.hello-cli.properties">src/it/projects/all-in-one/config/jpackage/windows/resources/hello-cli.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.invoker.properties">src/it/projects/step-by-step/invoker.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.mac.resources.hello-cli.launcher.properties">src/it/projects/all-in-one/config/jpackage/mac/resources/hello-cli.launcher.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.jpackage.PluginUtils.java">ru/akman/maven/plugins/jpackage/PluginUtils.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.mac.resources.hello-cli.launcher.properties">src/it/projects/step-by-step/config/jpackage/mac/resources/hello-cli.launcher.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.linux.resources.hello-cli.properties">src/it/projects/all-in-one/config/jpackage/linux/resources/hello-cli.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#target.maven-archiver.pom.properties">target/maven-archiver/pom.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.windows.resources.hello-cli.launcher.properties">src/it/projects/step-by-step/config/jpackage/windows/resources/hello-cli.launcher.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.jpackage.DependencySet.java">ru/akman/maven/plugins/jpackage/DependencySet.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.invoker.properties">src/it/projects/all-in-one/invoker.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.windows.resources.hello.properties">src/it/projects/step-by-step/config/jpackage/windows/resources/hello.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.jpackage.Launcher.java">ru/akman/maven/plugins/jpackage/Launcher.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.windows.resources.hello-cli.properties">src/it/projects/step-by-step/config/jpackage/windows/resources/hello-cli.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.mac.resources.hello-cli.properties">src/it/projects/step-by-step/config/jpackage/mac/resources/hello-cli.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.linux.resources.hello-cli.properties">src/it/projects/step-by-step/config/jpackage/linux/resources/hello-cli.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.mac.resources.hello.properties">src/it/projects/step-by-step/config/jpackage/mac/resources/hello.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#.mvn.wrapper.maven-wrapper.properties">.mvn/wrapper/maven-wrapper.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.linux.resources.hello.properties">src/it/projects/all-in-one/config/jpackage/linux/resources/hello.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.mac.associations.properties">src/it/projects/step-by-step/config/jpackage/mac/associations.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.linux.resources.hello-cli.launcher.properties">src/it/projects/step-by-step/config/jpackage/linux/resources/hello-cli.launcher.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.windows.associations.properties">src/it/projects/all-in-one/config/jpackage/windows/associations.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.jpackage.ModulePath.java">ru/akman/maven/plugins/jpackage/ModulePath.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.step-by-step.config.jpackage.linux.associations.properties">src/it/projects/step-by-step/config/jpackage/linux/associations.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.jpackage.JPackageMojoTest.java">ru/akman/maven/plugins/jpackage/JPackageMojoTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.windows.resources.hello.properties">src/it/projects/all-in-one/config/jpackage/windows/resources/hello.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#target.maven-plugin-help.properties">target/maven-plugin-help.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.jpackage.PackageType.java">ru/akman/maven/plugins/jpackage/PackageType.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.windows.resources.hello-cli.launcher.properties">src/it/projects/all-in-one/config/jpackage/windows/resources/hello-cli.launcher.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.BaseToolMojo.java">ru/akman/maven/plugins/BaseToolMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.jpackage.JPackageMojo.java">ru/akman/maven/plugins/jpackage/JPackageMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.CommandLineBuilder.java">ru/akman/maven/plugins/CommandLineBuilder.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.mac.resources.hello-cli.properties">src/it/projects/all-in-one/config/jpackage/mac/resources/hello-cli.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

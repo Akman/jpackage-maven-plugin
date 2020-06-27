@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseToolMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JPackage Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">ru.akman.maven.plugins</a> &gt; <span class="el_source">BaseToolMojo.java</span></div><h1>BaseToolMojo.java</h1><pre class="source lang-java linenums">/*
+  Copyright (C) 2020 Alexander Kapitman
+
+  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+package ru.akman.maven.plugins;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.model.fileset.util.FileSetManager;
+import org.apache.maven.toolchain.Toolchain;
+import org.apache.maven.toolchain.ToolchainManager;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
+
+/**
+ * Base class for creating a CLI tool Mojos.
+ */
+<span class="fc" id="L53">public abstract class BaseToolMojo extends AbstractMojo {</span>
+
+  /**
+   * The name of JDK toolchain.
+   */
+  private static final String JDK = &quot;jdk&quot;;
+
+  /**
+   * The name of the system environment JAVA_HOME variable.
+   */
+  private static final String JAVA_HOME = &quot;JAVA_HOME&quot;;
+
+  /**
+   * The value for older major versions of Java.
+   */
+  private static final int OLD_MAJOR = 1;
+
+  /**
+   * The value from which new major versions of Java begin.
+   */
+  private static final int NEW_MAJOR = 9;
+
+  /**
+   * The value from which the most recent major versions of Java begin.
+   */
+  private static final int NEW_RECENT = 14;
+
+  /**
+   * The value for android major versions of Java.
+   */
+  private static final int ANDROID_MAJOR = 0;
+
+  /**
+   * The value for android minor versions of Java.
+   */
+  private static final int ANDROID_MINOR = 9;
+
+  /**
+   * The name of the subdirectory under JAVA_HOME where executables live.
+   */
+  private static final String JAVA_HOME_BIN = &quot;bin&quot;;
+
+  /**
+   * The name of the system environment PATH variable.
+   */
+  private static final String PATH = &quot;PATH&quot;;
+
+  /**
+   * The name of the system environment PATHEXT variable.
+   */
+  private static final String PATHEXT = &quot;PATHEXT&quot;;
+
+  /**
+   * The version string pattern of CLI tool.
+   */
+  private static final String VERSION_PATTERN = &quot;^(\\d+)(\\.(\\d+))?.*&quot;;
+
+  /**
+   * The version option of CLI tool.
+   */
+  private static final String VERSION_OPTION = &quot;--version&quot;;
+
+  /**
+   * Project base directory (that containing the pom.xml file).
+   */
+  private File baseDir;
+  
+  /**
+   * Project build directory (${project.basedir}/target).
+   */
+  private File buildDir;
+
+  /**
+   * Project output directory (${project.build.directory}/classes).
+   */
+  private File outputDir;
+
+  /**
+   * Project properties.
+   */
+  private Properties properties;
+
+  /**
+   * Default charset (${project.build.sourceEncoding}).
+   */
+<span class="fc" id="L138">  private Charset sourceEncoding = Charset.defaultCharset();</span>
+
+  /**
+   * Fileset manager.
+   */
+  private FileSetManager fileSetManager;
+
+  /**
+   * All JDK toolchains available in user settings
+   * independently from maven-toolchains-plugin.
+   */
+  private List&lt;Toolchain&gt; toolchains;
+
+  /**
+   * JDK toolchain from build context,
+   * i.e. the toolchain selected by maven-toolchains-plugin.
+   */
+  private Toolchain toolchain;
+
+  /**
+   * Tool home directory.
+   */
+  private File toolHomeDirectory;
+
+  /**
+   * Tool executable.
+   */
+  private File toolExecutable;
+
+  /**
+   * Tool version.
+   */
+  private String toolVersion;
+
+  /**
+   * Tool corresponding java version.
+   */
+  private JavaVersion toolJavaVersion;
+
+  /**
+   * Toolchain manager.
+   */
+  @Component
+  private ToolchainManager toolchainManager;
+
+  /**
+   * Build plugin manager.
+   */
+  @Component
+  private BuildPluginManager pluginManager;
+
+  /**
+   * Maven project.
+   */
+  @Parameter(
+      defaultValue = &quot;${project}&quot;,
+      readonly = true,
+      required = true
+  )
+  private MavenProject project;
+
+  /**
+   * Maven session.
+   */
+  @Parameter(
+      defaultValue = &quot;${session}&quot;,
+      readonly = true,
+      required = true
+  )
+  private MavenSession session;
+
+  /**
+   * Get tool executable path from tool home.
+   *
+   * @param toolName the name of the tool (without extension)
+   * @param toolHomeDir the tool home directory
+   * @param toolBinDirName the name of subdirectory where the tool live
+   *
+   * @return tool executable path from tool home directory specified in
+   *         configuration as toolhome parameter or null
+   */
+  private Path getExecutableFromToolHome(final String toolName,
+      final File toolHomeDir, final String toolBinDirName) {
+<span class="nc bnc" id="L221" title="All 2 branches missed.">    Path executablePath = toolHomeDir == null</span>
+<span class="nc" id="L222">        ? null</span>
+<span class="nc" id="L223">        : resolveToolPath(toolName, toolHomeDir.toPath(), toolBinDirName);</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">    if (executablePath != null) {</span>
+      try {
+<span class="nc" id="L226">        executablePath = executablePath.toRealPath();</span>
+<span class="nc" id="L227">        toolHomeDirectory = toolHomeDir;</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">        if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L229">          getLog().debug(MessageFormat.format(</span>
+              &quot;Executable (toolhome) for [{0}]: {1}&quot;, toolName,
+              executablePath));
+<span class="nc" id="L232">          getLog().debug(MessageFormat.format(</span>
+              &quot;Home directory (toolhome) for [{0}]: {1}&quot;, toolName,
+              toolHomeDirectory));
+        }
+<span class="nc" id="L236">      } catch (IOException ex) {</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">        if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L238">          getLog().warn(MessageFormat.format(</span>
+              &quot;Unable to resolve executable (toolhome) for [{0}]: {1}&quot;,
+              toolName, executablePath), ex);
+        }
+<span class="nc" id="L242">      }</span>
+    }
+<span class="nc" id="L244">    return executablePath;</span>
+  }
+
+  /**
+   * Get tool executable path from default JDK toolchain.
+   *
+   * @param toolName the name of the tool (without extension)
+   *
+   * @return tool executable path from JDK toolchain specified in
+   *         configuration by toolchain plugin or null
+   */
+  @SuppressWarnings(&quot;deprecation&quot;) // DefaultJavaToolChain
+  private Path getExecutableFromToolchain(final String toolName) {
+<span class="nc bnc" id="L257" title="All 2 branches missed.">    final String tcJavaHome = toolchain == null</span>
+<span class="nc" id="L258">        ? null</span>
+<span class="nc" id="L259">        : org.apache.maven.toolchain.java.DefaultJavaToolChain.class.cast(</span>
+<span class="nc" id="L260">            toolchain).getJavaHome();</span>
+<span class="nc bnc" id="L261" title="All 2 branches missed.">    final String tcToolExecutable = toolchain == null</span>
+<span class="nc" id="L262">        ? null</span>
+<span class="nc" id="L263">        : toolchain.findTool(toolName);</span>
+<span class="nc" id="L264">    Path executablePath = null;</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">    if (!StringUtils.isBlank(tcJavaHome)</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">        &amp;&amp; !StringUtils.isBlank(tcToolExecutable)) {</span>
+      try {
+<span class="nc" id="L268">        executablePath = Paths.get(tcToolExecutable).toRealPath();</span>
+<span class="nc" id="L269">        toolHomeDirectory = new File(tcJavaHome);</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">        if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L271">          getLog().debug(MessageFormat.format(</span>
+              &quot;Executable (toolchain) for [{0}]: {1}&quot;, toolName,
+              executablePath));
+<span class="nc" id="L274">          getLog().debug(MessageFormat.format(</span>
+              &quot;Home directory (toolchain) for [{0}]: {1}&quot;, toolName,
+              toolHomeDirectory));
+        }
+<span class="nc" id="L278">      } catch (IOException ex) {</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L280">          getLog().warn(MessageFormat.format(</span>
+              &quot;Unable to resolve executable (toolchain) for [{0}]: {1}&quot;,
+              toolName, executablePath), ex);
+        }
+<span class="nc" id="L284">      }</span>
+    }
+<span class="nc" id="L286">    return executablePath;</span>
+  }
+
+  /**
+   * Get tool executable path from java home.
+   *
+   * @param toolName the name of the tool (without extension)
+   *
+   * @return tool executable path from JDK home directory specified in
+   *              the system environment variable JAVA_HOME or null
+   */
+  private Path getExecutableFromJavaHome(final String toolName) {
+<span class="nc" id="L298">    final File javaHomeDir = getJavaHome();</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">    Path executablePath = javaHomeDir == null</span>
+<span class="nc" id="L300">        ? null</span>
+<span class="nc" id="L301">        : resolveToolPath(toolName, javaHomeDir.toPath(), JAVA_HOME_BIN);</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">    if (executablePath != null) {</span>
+      try {
+<span class="nc" id="L304">        executablePath = executablePath.toRealPath();</span>
+<span class="nc" id="L305">        toolHomeDirectory = javaHomeDir;</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">        if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L307">          getLog().debug(MessageFormat.format(</span>
+              &quot;Executable (javahome) for [{0}]: {1}&quot;, toolName,
+              executablePath));
+<span class="nc" id="L310">          getLog().debug(MessageFormat.format(</span>
+              &quot;Home directory (javahome) for [{0}]: {1}&quot;, toolName,
+              toolHomeDirectory));
+        }
+<span class="nc" id="L314">      } catch (IOException ex) {</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">        if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L316">          getLog().warn(MessageFormat.format(</span>
+              &quot;Unable to resolve executable (javahome) for [{0}]: {1}&quot;,
+              toolName, executablePath), ex);
+        }
+<span class="nc" id="L320">      }</span>
+    }
+<span class="nc" id="L322">    return executablePath;</span>
+  }
+
+  /**
+   * Get tool executable path from system path.
+   *
+   * @param toolName the name of the tool (without extension)
+   *
+   * @return tool executable path from paths specified in
+   *              the system environment variable PATH or null
+   */
+  private Path getExecutableFromSystemPath(final String toolName) {
+<span class="nc" id="L334">    final List&lt;Path&gt; systemPath = getSystemPath();</span>
+<span class="nc" id="L335">    Path executablePath = null;</span>
+<span class="nc bnc" id="L336" title="All 2 branches missed.">    for (final Path path : systemPath) {</span>
+<span class="nc" id="L337">      executablePath = resolveToolPath(toolName, path, null);</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">      if (executablePath != null) {</span>
+<span class="nc" id="L339">        break;</span>
+      }
+<span class="nc" id="L341">    }</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">    if (executablePath != null) {</span>
+      try {
+<span class="nc" id="L344">        final Path toolHomePath = executablePath.getParent();</span>
+<span class="nc bnc" id="L345" title="All 2 branches missed.">        toolHomeDirectory = toolHomePath == null</span>
+<span class="nc" id="L346">            ? null : toolHomePath.toRealPath().toFile();</span>
+<span class="nc" id="L347">        executablePath = executablePath.toRealPath();</span>
+<span class="nc bnc" id="L348" title="All 2 branches missed.">        if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L349">          getLog().debug(MessageFormat.format(</span>
+              &quot;Executable (systempath) for [{0}]: {1}&quot;, toolName,
+              executablePath));
+<span class="nc" id="L352">          getLog().debug(MessageFormat.format(</span>
+              &quot;Home directory (systempath) for [{0}]: {1}&quot;, toolName,
+              toolHomeDirectory));
+        }
+<span class="nc" id="L356">      } catch (IOException ex) {</span>
+<span class="nc bnc" id="L357" title="All 2 branches missed.">        if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L358">          getLog().warn(MessageFormat.format(</span>
+              &quot;Unable to resolve executable (systempath) for [{0}]: {1}&quot;,
+              toolName, executablePath), ex);
+        }
+<span class="nc" id="L362">      }</span>
+    }
+<span class="nc" id="L364">    return executablePath;</span>
+  }
+
+  /**
+   * Get tool executable path.
+   *
+   * &lt;p&gt;
+   * Find tool executable in following order:
+   * - toolhome (user specified tool home directory in configuration)
+   * - toolchain (user specified JDK home directory by toolchains-plugin)
+   * - javahome (JDK home directory specified by system variable JAVA_HOME)
+   * - systempath (system path)
+   * &lt;/p&gt;
+   *
+   * @param toolName the name of the tool (without extension)
+   * @param toolHomeDir the tool home directory
+   * @param toolBinDirName the name of subdirectory where the tool live
+   *
+   * @return tool executable path from tool home directory specified in
+   *         configuration or by toolchain plugin or by system variable
+   *         JAVA_HOME or null
+   */
+  private Path getToolExecutablePath(final String toolName,
+      final File toolHomeDir, final String toolBinDirName) {
+<span class="nc" id="L388">    Path executablePath =</span>
+<span class="nc" id="L389">        getExecutableFromToolHome(toolName, toolHomeDir, toolBinDirName);</span>
+<span class="nc bnc" id="L390" title="All 2 branches missed.">    if (executablePath != null) {</span>
+<span class="nc" id="L391">      return executablePath;</span>
+    }
+<span class="nc bnc" id="L393" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L394">      getLog().debug(MessageFormat.format(</span>
+          &quot;Executable (toolhome) for [{0}] not found&quot;, toolName));
+    }
+<span class="nc" id="L397">    executablePath = getExecutableFromToolchain(toolName);</span>
+<span class="nc bnc" id="L398" title="All 2 branches missed.">    if (executablePath != null) {</span>
+<span class="nc" id="L399">      return executablePath;</span>
+    }
+<span class="nc bnc" id="L401" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L402">      getLog().debug(MessageFormat.format(</span>
+          &quot;Executable (toolchain) for [{0}] not found&quot;, toolName));
+    }
+<span class="nc" id="L405">    executablePath = getExecutableFromJavaHome(toolName);</span>
+<span class="nc bnc" id="L406" title="All 2 branches missed.">    if (executablePath != null) {</span>
+<span class="nc" id="L407">      return executablePath;</span>
+    }
+<span class="nc bnc" id="L409" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L410">      getLog().debug(MessageFormat.format(</span>
+          &quot;Executable (javahome) for [{0}] not found&quot;, toolName));
+    }
+<span class="nc" id="L413">    executablePath = getExecutableFromSystemPath(toolName);</span>
+<span class="nc bnc" id="L414" title="All 2 branches missed.">    if (executablePath != null) {</span>
+<span class="nc" id="L415">      return executablePath;</span>
+    }
+<span class="nc bnc" id="L417" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L418">      getLog().debug(MessageFormat.format(</span>
+          &quot;Executable (systempath) for [{0}] not found&quot;, toolName));
+    }
+<span class="nc" id="L421">    return executablePath;</span>
+  }
+
+  /**
+   * Resolve the tool path against the specified home dir.
+   *
+   * @param toolName the name of the tool (without extension)
+   * @param toolHomeDir the home path of the tool
+   * @param toolBinDirName the name of subdirectory where the tool live
+   *
+   * @return tool executable path or null
+   */
+  private Path resolveToolPath(final String toolName, final Path toolHomeDir,
+      final String toolBinDirName) {
+<span class="nc bnc" id="L435" title="All 4 branches missed.">    if (toolHomeDir == null || StringUtils.isBlank(toolName)) {</span>
+<span class="nc" id="L436">      return null;</span>
+    }
+<span class="nc" id="L438">    Path toolBinDir = toolHomeDir;</span>
+<span class="nc bnc" id="L439" title="All 2 branches missed.">    if (!StringUtils.isBlank(toolBinDirName)) {</span>
+<span class="nc" id="L440">      toolBinDir = toolHomeDir.resolve(toolBinDirName);</span>
+    }
+<span class="nc bnc" id="L442" title="All 4 branches missed.">    if (!Files.exists(toolBinDir) || !Files.isDirectory(toolBinDir)) {</span>
+<span class="nc" id="L443">      return null;</span>
+    }
+<span class="nc" id="L445">    return findToolExecutable(toolName, List.of(toolBinDir));</span>
+  }
+
+  /**
+   * Find tool executable under specified paths.
+   *
+   * @param toolName the name of the tool (without extension)
+   * @param paths the list of path under which the tool will be find
+   *
+   * @return tool executable path or null if it not found
+   */
+  private Path findToolExecutable(final String toolName,
+      final List&lt;Path&gt; paths) {
+<span class="nc" id="L458">    Path executablePath = null;</span>
+<span class="nc" id="L459">    Path toolFile = null;</span>
+<span class="nc" id="L460">    final List&lt;String&gt; exts = getPathExt();</span>
+<span class="nc bnc" id="L461" title="All 2 branches missed.">    for (final Path path : paths) {</span>
+<span class="nc bnc" id="L462" title="All 2 branches missed.">      if (SystemUtils.IS_OS_WINDOWS) {</span>
+<span class="nc bnc" id="L463" title="All 2 branches missed.">        for (final String ext : exts) {</span>
+<span class="nc" id="L464">          toolFile = path.resolve(toolName.concat(ext));</span>
+<span class="nc bnc" id="L465" title="All 2 branches missed.">          if (Files.isExecutable(toolFile)</span>
+<span class="nc bnc" id="L466" title="All 2 branches missed.">              &amp;&amp; !Files.isDirectory(toolFile)) {</span>
+<span class="nc" id="L467">            executablePath = toolFile;</span>
+<span class="nc" id="L468">            break;</span>
+          }
+<span class="nc" id="L470">        }</span>
+      } else {
+<span class="nc" id="L472">        toolFile = path.resolve(toolName);</span>
+<span class="nc bnc" id="L473" title="All 2 branches missed.">        if (Files.isExecutable(toolFile)</span>
+<span class="nc bnc" id="L474" title="All 2 branches missed.">            &amp;&amp; !Files.isDirectory(toolFile)) {</span>
+<span class="nc" id="L475">          executablePath = toolFile;</span>
+<span class="nc" id="L476">          break;</span>
+        }
+      }
+<span class="nc" id="L479">    }</span>
+<span class="nc" id="L480">    return executablePath;</span>
+  }
+
+  /**
+   * Get path from the system environment variable JAVA_HOME.
+   *
+   * @return path from the system environment variable JAVA_HOME
+   */
+  private File getJavaHome() {
+<span class="nc" id="L489">    final String javaHome = StringUtils.stripToEmpty(System.getenv(JAVA_HOME));</span>
+<span class="nc bnc" id="L490" title="All 2 branches missed.">    return StringUtils.isBlank(javaHome) ? null : new File(javaHome);</span>
+  }
+
+  /**
+   * Get list of the paths registered in the system environment variable PATH.
+   *
+   * @return list of the paths registered in the system
+   *         environment variable PATH.
+   */
+  private List&lt;Path&gt; getSystemPath() {
+<span class="nc" id="L500">    final String systemPath = StringUtils.stripToEmpty(System.getenv(PATH));</span>
+<span class="nc bnc" id="L501" title="All 2 branches missed.">    if (StringUtils.isBlank(systemPath)) {</span>
+<span class="nc" id="L502">      return new ArrayList&lt;Path&gt;();</span>
+    }
+<span class="nc" id="L504">    return Stream.of(systemPath.split(File.pathSeparator))</span>
+<span class="nc bnc" id="L505" title="All 2 branches missed.">        .filter(s -&gt; !StringUtils.isBlank(s))</span>
+<span class="nc" id="L506">        .map(s -&gt; Paths.get(StringUtils.stripToEmpty(s)))</span>
+<span class="nc" id="L507">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Get list of the registered path extensions from
+   * the system environment variable PATHEXT.
+   *
+   * @return list of the registered path extensions from the system
+   *         environment variable PATHEXT
+   */
+  private List&lt;String&gt; getPathExt() {
+<span class="nc bnc" id="L518" title="All 2 branches missed.">    if (SystemUtils.IS_OS_WINDOWS) {</span>
+<span class="nc" id="L519">      final String systemPathExt =</span>
+<span class="nc" id="L520">          StringUtils.stripToEmpty(System.getenv(PATHEXT));</span>
+<span class="nc bnc" id="L521" title="All 2 branches missed.">      if (!StringUtils.isBlank(systemPathExt)) {</span>
+<span class="nc" id="L522">        return Stream.of(systemPathExt.split(File.pathSeparator))</span>
+<span class="nc bnc" id="L523" title="All 2 branches missed.">            .filter(s -&gt; !StringUtils.isBlank(s))</span>
+<span class="nc" id="L524">            .map(s -&gt; StringUtils.stripToEmpty(s))</span>
+<span class="nc" id="L525">            .collect(Collectors.toList());</span>
+      }
+    }
+<span class="nc" id="L528">    return new ArrayList&lt;String&gt;();</span>
+  }
+
+  /**
+   * Obtain the tool version.
+   *
+   * @return the tool version or null
+   *
+   * @throws CommandLineException if any errors occurred while processing
+   *                              command line
+   */
+  private String obtainToolVersion(final Path executablePath)
+      throws CommandLineException {
+<span class="nc" id="L541">    final Commandline cmdLine = new Commandline();</span>
+<span class="nc" id="L542">    cmdLine.setExecutable(executablePath.toString());</span>
+<span class="nc" id="L543">    cmdLine.createArg().setValue(VERSION_OPTION);</span>
+<span class="nc" id="L544">    final CommandLineUtils.StringStreamConsumer out =</span>
+        new CommandLineUtils.StringStreamConsumer();
+<span class="nc" id="L546">    final CommandLineUtils.StringStreamConsumer err =</span>
+        new CommandLineUtils.StringStreamConsumer();
+<span class="nc bnc" id="L548" title="All 2 branches missed.">    return execCmdLine(cmdLine, out, err) == 0</span>
+<span class="nc" id="L549">        ? StringUtils.stripToEmpty(out.getOutput())</span>
+<span class="nc" id="L550">        : null;</span>
+  }
+
+  /**
+   * Get Java version corresponding to the tool version passed in.
+   *
+   * @param version the tool version, not null
+   *
+   * @return the corresponding Java version matching the tool version
+   */
+  private JavaVersion getCorrespondingJavaVersion(final String version) {
+<span class="nc" id="L561">    JavaVersion resolvedVersion = null;</span>
+<span class="nc bnc" id="L562" title="All 2 branches missed.">    if (version != null) {</span>
+<span class="nc" id="L563">      final Matcher versionMatcher = Pattern.compile(VERSION_PATTERN)</span>
+<span class="nc" id="L564">          .matcher(version);</span>
+<span class="nc bnc" id="L565" title="All 2 branches missed.">      if (versionMatcher.matches()) {</span>
+        // always present
+<span class="nc" id="L567">        final String majorVersionPart = versionMatcher.group(1);</span>
+<span class="nc" id="L568">        final int majorVersion = Integer.parseInt(majorVersionPart);</span>
+        // optional part
+<span class="nc" id="L570">        final String minorVersionPart = versionMatcher.group(3);</span>
+<span class="nc bnc" id="L571" title="All 2 branches missed.">        final int minorVersion = StringUtils.isBlank(minorVersionPart)</span>
+<span class="nc" id="L572">            ? 0 : Integer.parseInt(minorVersionPart);</span>
+<span class="nc bnc" id="L573" title="All 2 branches missed.">        if (majorVersion &gt;= NEW_MAJOR) {</span>
+<span class="nc bnc" id="L574" title="All 2 branches missed.">          if (majorVersion &gt;= NEW_RECENT) {</span>
+<span class="nc" id="L575">            resolvedVersion = JavaVersion.JAVA_RECENT;</span>
+          } else {
+<span class="nc" id="L577">            resolvedVersion = JavaVersion.valueOf(&quot;JAVA_&quot; + majorVersion);</span>
+          }
+        } else {
+          // JAVA_1_1 - JAVA_1_9 || JAVA_0_9 (android)
+<span class="nc bnc" id="L581" title="All 10 branches missed.">          if (majorVersion == OLD_MAJOR</span>
+              &amp;&amp; minorVersion &gt; 0
+              &amp;&amp; minorVersion &lt;= NEW_MAJOR
+              || majorVersion == ANDROID_MAJOR
+              &amp;&amp; minorVersion == ANDROID_MINOR) {
+<span class="nc" id="L586">            resolvedVersion = JavaVersion.valueOf(&quot;JAVA_&quot; + majorVersion</span>
+                + &quot;_&quot; + minorVersion);
+          }
+        }
+      }
+    }
+<span class="nc" id="L592">    return resolvedVersion;</span>
+  }
+
+  /**
+   * Get JDK toolchain specified in toolchains-plugin for
+   * current build context.
+   *
+   * @return JDK toolchain
+   */
+  @SuppressWarnings(&quot;deprecation&quot;) // DefaultJavaToolChain
+  private Toolchain getDefaultJavaToolchain() {
+<span class="nc" id="L603">    final Toolchain ctxToolchain =</span>
+<span class="nc" id="L604">        getToolchainManager().getToolchainFromBuildContext(JDK, getSession());</span>
+<span class="nc bnc" id="L605" title="All 4 branches missed.">    return ctxToolchain == null || !(ctxToolchain</span>
+        instanceof org.apache.maven.toolchain.java.DefaultJavaToolChain)
+<span class="nc" id="L607">        ? null : ctxToolchain;</span>
+  }
+
+  /**
+   * Log result of the commandline execution.
+   *
+   * @param cmdLine the command line
+   * @param exitCode the exit code
+   * @param stdout the standard output
+   * @param stderr the standard error
+   */
+  private void logCommandLineExecution(final Commandline cmdLine,
+      final int exitCode, final String stdout, final String stderr) {
+<span class="nc bnc" id="L620" title="All 2 branches missed.">    if (exitCode == 0) {</span>
+<span class="nc bnc" id="L621" title="All 2 branches missed.">      if (getLog().isDebugEnabled()) {</span>
+<span class="nc bnc" id="L622" title="All 2 branches missed.">        if (!StringUtils.isBlank(stdout)) {</span>
+<span class="nc" id="L623">          getLog().debug(System.lineSeparator() + stdout);</span>
+        }
+<span class="nc bnc" id="L625" title="All 2 branches missed.">        if (!StringUtils.isBlank(stderr)) {</span>
+<span class="nc" id="L626">          getLog().debug(System.lineSeparator() + stderr);</span>
+        }
+      }
+    } else {
+<span class="nc bnc" id="L630" title="All 2 branches missed.">      if (getLog().isErrorEnabled()) {</span>
+<span class="nc" id="L631">        getLog().error(System.lineSeparator() + &quot;Exit code: &quot; + exitCode);</span>
+<span class="nc bnc" id="L632" title="All 2 branches missed.">        if (!StringUtils.isBlank(stdout)) {</span>
+<span class="nc" id="L633">          getLog().error(System.lineSeparator() + stdout);</span>
+        }
+<span class="nc bnc" id="L635" title="All 2 branches missed.">        if (!StringUtils.isBlank(stderr)) {</span>
+<span class="nc" id="L636">          getLog().error(System.lineSeparator() + stderr);</span>
+        }
+<span class="nc" id="L638">        getLog().error(System.lineSeparator()</span>
+            + &quot;Command line was: &quot;
+<span class="nc" id="L640">            + CommandLineUtils.toString(cmdLine.getCommandline()));</span>
+      }
+    }
+<span class="nc" id="L643">  }</span>
+
+  /**
+   * Get project base directory.
+   *
+   * @return project base directory (that containing the pom.xml file)
+   */
+  protected File getBaseDir() {
+<span class="nc" id="L651">    return baseDir;</span>
+  }
+
+  /**
+   * Get project build directory.
+   *
+   * @return project build directory (${project.basedir}/target)
+   */
+  protected File getBuildDir() {
+<span class="nc" id="L660">    return buildDir;</span>
+  }
+
+  /**
+   * Get project output directory.
+   *
+   * @return project output directory (${project.build.directory}/classes)
+   */
+  protected File getOutputDir() {
+<span class="nc" id="L669">    return outputDir;</span>
+  }
+
+  /**
+   * Get project properties.
+   *
+   * @return project properties
+   */
+  protected Properties getProperties() {
+<span class="nc" id="L678">    return properties;</span>
+  }
+
+  /**
+   * Get default charset.
+   *
+   * @return default charset (${project.build.sourceEncoding})
+   */
+  protected Charset getCharset() {
+<span class="nc" id="L687">    return sourceEncoding;</span>
+  }
+
+  /**
+   * Get fileset manager.
+   *
+   * @return fileset manager
+   */
+  protected FileSetManager getFileSetManager() {
+<span class="nc" id="L696">    return fileSetManager;</span>
+  }
+
+  /**
+   * Get list of all JDK toolchains available in user settings
+   * independently from maven-toolchains-plugin.
+   *
+   * @return list of all JDK toolchains available in user settings
+   */
+  protected List&lt;Toolchain&gt; getToolchains() {
+<span class="nc" id="L706">    return toolchains;</span>
+  }
+
+  /**
+   * Get JDK toolchain from build context,
+   * i.e. the toolchain selected by maven-toolchains-plugin.
+   *
+   * @return JDK toolchain from build context
+   */
+  protected Toolchain getToolchain() {
+<span class="nc" id="L716">    return toolchain;</span>
+  }
+
+  /**
+   * Get tool home directory.
+   *
+   * @return tool home directory
+   */
+  protected File getToolHomeDirectory() {
+<span class="nc" id="L725">    return toolHomeDirectory;</span>
+  }
+
+  /**
+   * Get tool executable.
+   *
+   * @return tool executable
+   */
+  protected File getToolExecutable() {
+<span class="nc" id="L734">    return toolExecutable;</span>
+  }
+
+  /**
+   * Get tool version.
+   *
+   * @return tool version
+   */
+  protected String getToolVersion() {
+<span class="nc" id="L743">    return toolVersion;</span>
+  }
+
+  /**
+   * Get tool corresponding java version.
+   *
+   * @return tool corresponding java version
+   */
+  protected JavaVersion getToolJavaVersion() {
+<span class="nc" id="L752">    return toolJavaVersion;</span>
+  }
+
+  /**
+   * Get toolchain manager.
+   *
+   * @return toolchain manager
+   */
+  protected ToolchainManager getToolchainManager() {
+<span class="nc" id="L761">    return toolchainManager;</span>
+  }
+
+  /**
+   * Get plugin manager.
+   *
+   * @return plugin manager
+   */
+  protected BuildPluginManager getPluginManager() {
+<span class="nc" id="L770">    return pluginManager;</span>
+  }
+
+  /**
+   * Get maven project.
+   *
+   * @return maven project
+   */
+  protected MavenProject getProject() {
+<span class="nc" id="L779">    return project;</span>
+  }
+
+  /**
+   * Get maven session.
+   *
+   * @return maven session
+   */
+  protected MavenSession getSession() {
+<span class="nc" id="L788">    return session;</span>
+  }
+
+  /**
+   * Execute command line.
+   *
+   * @param cmdLine command line
+   *
+   * @return exit code
+   *
+   * @throws CommandLineException if any errors occurred while processing
+   *                              command line
+   */
+  protected int execCmdLine(final Commandline cmdLine)
+      throws CommandLineException {
+<span class="nc" id="L803">    return execCmdLine(cmdLine, null, null);</span>
+  }
+
+  /**
+   * Execute command line with defined standard output/error streams.
+   *
+   * @param cmdLine command line
+   * @param out standard output, can be null
+   * @param err standard error, can be null
+   *
+   * @return exit code
+   *
+   * @throws CommandLineException if any errors occurred while processing
+   *                              command line
+   */
+  protected int execCmdLine(final Commandline cmdLine,
+      final CommandLineUtils.StringStreamConsumer out,
+      final CommandLineUtils.StringStreamConsumer err)
+      throws CommandLineException {
+<span class="nc bnc" id="L822" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L823">      getLog().debug(CommandLineUtils.toString(cmdLine.getCommandline()));</span>
+    }
+<span class="nc bnc" id="L825" title="All 2 branches missed.">    final CommandLineUtils.StringStreamConsumer stdout = out == null</span>
+<span class="nc" id="L826">        ? new CommandLineUtils.StringStreamConsumer()</span>
+<span class="nc" id="L827">        : out;</span>
+<span class="nc bnc" id="L828" title="All 2 branches missed.">    final CommandLineUtils.StringStreamConsumer stderr = err == null</span>
+<span class="nc" id="L829">        ? new CommandLineUtils.StringStreamConsumer()</span>
+<span class="nc" id="L830">        : err;</span>
+<span class="nc" id="L831">    final int exitCode =</span>
+<span class="nc" id="L832">        CommandLineUtils.executeCommandLine(cmdLine, stdout, err);</span>
+<span class="nc" id="L833">    logCommandLineExecution(cmdLine, exitCode, stdout.getOutput(),</span>
+<span class="nc" id="L834">        stderr.getOutput());</span>
+<span class="nc" id="L835">    return exitCode;</span>
+  }
+
+  /**
+   * Init Mojo.
+   *
+   * @param toolName the name of the tool (without extension)
+   * @param toolHomeDir the tool home directory
+   * @param toolBinDirName the name of subdirectory where the tool live
+   *                       relative to the tool home directory
+   *
+   * @throws MojoExecutionException if any errors occurred while processing
+   *                                configuration parameters
+   */
+  protected void init(final String toolName, final File toolHomeDir,
+      final String toolBinDirName) throws MojoExecutionException {
+<span class="nc bnc" id="L851" title="All 2 branches missed.">    if (getProject() == null) {</span>
+<span class="nc" id="L852">      throw new MojoExecutionException(</span>
+          &quot;Error: The predefined variable ${project} is not defined&quot;);
+    }
+
+<span class="nc bnc" id="L856" title="All 2 branches missed.">    if (getSession() == null) {</span>
+<span class="nc" id="L857">      throw new MojoExecutionException(</span>
+          &quot;Error: The predefined variable ${session} is not defined&quot;);
+    }
+
+<span class="nc" id="L861">    baseDir = getProject().getBasedir();</span>
+<span class="nc bnc" id="L862" title="All 2 branches missed.">    if (baseDir == null) {</span>
+<span class="nc" id="L863">      throw new MojoExecutionException(</span>
+          &quot;Error: The predefined variable ${project.basedir} is not defined&quot;);
+    }
+
+<span class="nc" id="L867">    buildDir = new File(getProject().getBuild().getDirectory());</span>
+<span class="nc bnc" id="L868" title="All 2 branches missed.">    if (buildDir == null) {</span>
+<span class="nc" id="L869">      throw new MojoExecutionException(</span>
+          &quot;Error: The predefined variable ${project.build.directory} is not defined&quot;);
+    }
+
+<span class="nc" id="L873">    outputDir = new File(getProject().getBuild().getOutputDirectory());</span>
+<span class="nc bnc" id="L874" title="All 2 branches missed.">    if (outputDir == null) {</span>
+<span class="nc" id="L875">      throw new MojoExecutionException(</span>
+          &quot;Error: The predefined variable ${project.build.outputDirectory} is not defined&quot;);
+    }
+
+<span class="nc" id="L879">    properties = getProject().getProperties();</span>
+<span class="nc bnc" id="L880" title="All 2 branches missed.">    if (properties == null) {</span>
+<span class="nc" id="L881">      throw new MojoExecutionException(</span>
+          &quot;Error: Unable to read project properties&quot;);
+    }
+
+<span class="nc" id="L885">    fileSetManager = new FileSetManager(getLog(), true);</span>
+<span class="nc bnc" id="L886" title="All 2 branches missed.">    if (fileSetManager == null) {</span>
+<span class="nc" id="L887">      throw new MojoExecutionException(</span>
+          &quot;Error: Unable to create file set manager&quot;);
+    }
+
+    // Get charset to write files
+<span class="nc" id="L892">    final String encoding =</span>
+<span class="nc" id="L893">        properties.getProperty(&quot;project.build.sourceEncoding&quot;);</span>
+    try {
+<span class="nc" id="L895">      sourceEncoding = Charset.forName(encoding);</span>
+<span class="nc" id="L896">    } catch (IllegalArgumentException ex) {</span>
+<span class="nc bnc" id="L897" title="All 2 branches missed.">      if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L898">        getLog().warn(&quot;Unable to read ${project.build.sourceEncoding}&quot;);</span>
+      }
+<span class="nc" id="L900">    }</span>
+<span class="nc bnc" id="L901" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L902">      getLog().debug(MessageFormat.format(</span>
+          &quot;Using source encoding: [{0}] to write files&quot;, sourceEncoding));
+    }
+
+    // Resolve all available jdk toolchains
+<span class="nc" id="L907">    toolchains = getToolchainManager().getToolchains(getSession(), JDK, null);</span>
+<span class="nc bnc" id="L908" title="All 2 branches missed.">    if (toolchains == null) {</span>
+<span class="nc bnc" id="L909" title="All 2 branches missed.">      if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L910">        getLog().debug(&quot;No toolchains found&quot;);</span>
+      }
+    } else {
+<span class="nc" id="L913">      toolchains.forEach(tc -&gt; {</span>
+<span class="nc bnc" id="L914" title="All 2 branches missed.">        if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L915">          getLog().debug(&quot;Found toolchain: &quot; + tc);</span>
+        }
+<span class="nc" id="L917">      });</span>
+    }
+
+    // Retrieve jdk toolchain from build context,
+    // i.e. the toolchain selected by maven-toolchains-plugin
+<span class="nc" id="L922">    toolchain = getDefaultJavaToolchain();</span>
+<span class="nc bnc" id="L923" title="All 2 branches missed.">    if (toolchain == null) {</span>
+<span class="nc bnc" id="L924" title="All 2 branches missed.">      if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L925">        getLog().debug(&quot;Toolchain not specified&quot;);</span>
+      }
+    } else {
+<span class="nc bnc" id="L928" title="All 2 branches missed.">      if (getLog().isInfoEnabled()) {</span>
+<span class="nc" id="L929">        getLog().info(&quot;Using toolchain: &quot; + toolchain);</span>
+      }
+    }
+
+    // Resolve the tool home directory and executable file
+<span class="nc" id="L934">    final Path executablePath =</span>
+<span class="nc" id="L935">        getToolExecutablePath(toolName, toolHomeDir, toolBinDirName);</span>
+<span class="nc bnc" id="L936" title="All 2 branches missed.">    if (executablePath == null) {</span>
+<span class="nc" id="L937">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: Executable for [{0}] not found&quot;, toolName));
+    }
+<span class="nc" id="L940">    toolExecutable = executablePath.toFile();</span>
+
+    // Obtain the tool version
+    try {
+<span class="nc" id="L944">      toolVersion = obtainToolVersion(executablePath);</span>
+<span class="nc" id="L945">    } catch (CommandLineException ex) {</span>
+<span class="nc" id="L946">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: Unable to obtain version of [{0}]&quot;, toolName), ex);
+<span class="nc" id="L948">    }</span>
+<span class="nc bnc" id="L949" title="All 2 branches missed.">    if (toolVersion == null) {</span>
+<span class="nc bnc" id="L950" title="All 2 branches missed.">      if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L951">        getLog().warn(MessageFormat.format(</span>
+            &quot;Unable to resolve version of [{0}]&quot;, toolName));
+      }
+    } else {
+<span class="nc bnc" id="L955" title="All 2 branches missed.">      if (getLog().isInfoEnabled()) {</span>
+<span class="nc" id="L956">        getLog().info(MessageFormat.format(&quot;Version of [{0}]: {1}&quot;, toolName,</span>
+            toolVersion));
+      }
+    }
+
+    // Obtain the corresponding java version matching the tool version
+<span class="nc" id="L962">    toolJavaVersion = getCorrespondingJavaVersion(toolVersion);</span>
+<span class="nc bnc" id="L963" title="All 2 branches missed.">    if (toolJavaVersion == null) {</span>
+<span class="nc bnc" id="L964" title="All 2 branches missed.">      if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L965">        getLog().warn(MessageFormat.format(</span>
+            &quot;Unable to resolve corresponding java version of [{0}]&quot;,
+            toolName));
+      }
+    } else {
+<span class="nc bnc" id="L970" title="All 2 branches missed.">      if (getLog().isInfoEnabled()) {</span>
+<span class="nc" id="L971">        getLog().info(MessageFormat.format(</span>
+            &quot;Version (corresponding java version) of [{0}]: {1}&quot;, toolName,
+            toolJavaVersion));
+      }
+    }
+
+<span class="nc" id="L977">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

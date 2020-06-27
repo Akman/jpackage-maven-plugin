@@ -61,7 +61,7 @@
     <libs.dir>${jlink.dir}/libs</libs.dir>
     <image.dir>${jlink.dir}/image</image.dir>
     <jre.dir>${jlink.dir}/jre</jre.dir>
-    <jpackage.dir>${project.build.directory}/jpackage</jpackage.dir>
+    <jpackage.dir>${build.dir}/jpackage</jpackage.dir>
     <jpackage.config.dir>${project.basedir}/config/jpackage</jpackage.config.dir>
     <jpackage.platform.dir>${jpackage.config.dir}/${platformFamily}</jpackage.platform.dir>
     <jpackage.resources.dir>${jpackage.platform.dir}/resources</jpackage.resources.dir>
@@ -171,7 +171,6 @@
         <artifactId>jlink-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>jlink-image</id>
             <goals>
               <goal>jlink</goal>
             </goals>
@@ -189,13 +188,13 @@
               <!--
                 Specifies the location in which modular dependencies
                 will be placed.
-                Default value: ${project.build.directory}/jlink/mods.
+                Default value: ${build.dir}/jlink/mods.
               -->
               <modsdir>${mods.dir}</modsdir>
               <!--
                 Specifies the location in which non modular dependencies
                 will be placed.
-                Default value: ${project.build.directory}/jlink/libs.
+                Default value: ${build.dir}/jlink/libs.
               -->
               <libsdir>${libs.dir}</libsdir>
 
@@ -254,7 +253,7 @@
               </addmodules>
               <!--
                 Specifies the location of the generated runtime image.
-                Default value: ${project.build.directory}/jlink/image.
+                Default value: ${build.dir}/jlink/image.
               -->
               <output>${image.dir}</output>
               <!--
@@ -287,7 +286,7 @@
               <!--
                 Post process an existing image.
               -->
-              <!--postprocesspath>${project.build.directory}/imagefile</postprocesspath-->
+              <!--postprocesspath>${build.dir}/imagefile</postprocesspath-->
               <!--
                 Enable verbose tracing.
                 Default value: false.
@@ -562,7 +561,7 @@
 
               <!--
                 Specifies the location in which generated output files are placed.
-                Default value: ${project.build.directory}/jpackage
+                Default value: ${build.dir}/jpackage
               -->
               <dest>${jpackage.dir}</dest>
               <!--
@@ -570,7 +569,7 @@
                 If specified, the directory will not be removed upon the task
                 completion and must be removed manually.
               -->
-              <!--temp>${project.build.directory}/jpackage/temp-app-image</temp-->
+              <!--temp>${build.dir}/jpackage/temp-app-image</temp-->
               <!--
                 Specifies the name of subdirectory relative to
                 the destination directory in which files of generated
@@ -618,7 +617,7 @@
                 the files to be packaged. All files in the input directory
                 will be packaged into the application image.
               -->
-              <!--input>${project.build.directory}/jlink/libs</input-->
+              <!--input>${build.dir}/jlink/libs</input-->
 
 
               <!-- options for creating the runtime image -->
@@ -760,7 +759,7 @@
                 Specifies the location of the predefined application image
                 that is used to build an installable package.
               -->
-              <!--appimage>${project.build.directory}/jpackage/appimage</appimage-->
+              <!--appimage>${build.dir}/jpackage/appimage</appimage-->
               <!--
                 Specifies the location of a properties file that contains
                 list of key, value pairs. The keys "extension", "mime-type",
@@ -933,7 +932,7 @@
 
               <!--
                 Specifies the location in which generated output files are placed.
-                Default value: ${project.build.directory}/jpackage
+                Default value: ${build.dir}/jpackage
               -->
               <dest>${jpackage.dir}</dest>
               <!--
@@ -941,7 +940,7 @@
                 If specified, the directory will not be removed upon the task
                 completion and must be removed manually.
               -->
-              <!--temp>${project.build.directory}/jpackage/temp-app-installer</temp-->
+              <!--temp>${build.dir}/jpackage/temp-app-installer</temp-->
               <!--
                 Specifies the installable package name.
               -->
@@ -987,7 +986,7 @@
                 the files to be packaged. All files in the input directory
                 will be packaged into the application image.
               -->
-              <!--input>${project.build.directory}/jlink/libs</input-->
+              <!--input>${build.dir}/jlink/libs</input-->
 
 
               <!-- options for creating the runtime image -->
@@ -1004,7 +1003,7 @@
                   - no-man-pages
                   - strip-native-commands
               -->
-              <!--runtimeimage>${project.build.directory}/jlink/image</runtimeimage-->
+              <!--runtimeimage>${build.dir}/jlink/image</runtimeimage-->
               <!--
                 Specifies the module path. The path where the jlink tool
                 discovers observable modules: modular JAR files, JMOD files,

@@ -145,7 +145,7 @@
       <item name= href= img= position= alt= border= width= height= target= title= />
       -->
     </breadcrumbs>
-    
+
     <!--
     <menu name= inherit= inheritAsRef= ref= img= alt= position= border= width= height= title= >
       <item collapse= ref= name= href= img= position= alt= border= width= height= target= title= >
@@ -179,7 +179,7 @@
     -->
     <menu ref="reports" />
 
-    <footer>${project.copyright}. All rights reserved.</footer>
+    <footer>${copyright.notice}. All rights reserved.</footer>
 
   </body>
 

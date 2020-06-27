@@ -1,0 +1,1919 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JPackageMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JPackage Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">ru.akman.maven.plugins.jpackage</a> &gt; <span class="el_source">JPackageMojo.java</span></div><h1>JPackageMojo.java</h1><pre class="source lang-java linenums">/*
+  Copyright (C) 2020 Alexander Kapitman
+
+  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+package ru.akman.maven.plugins.jpackage;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.shared.model.fileset.FileSet;
+import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
+import org.codehaus.plexus.languages.java.jpms.LocationManager;
+import org.codehaus.plexus.languages.java.jpms.ModuleNameSource;
+import org.codehaus.plexus.languages.java.jpms.ResolvePathsRequest;
+import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.Commandline;
+import ru.akman.maven.plugins.BaseToolMojo;
+import ru.akman.maven.plugins.CommandLineBuilder;
+import ru.akman.maven.plugins.CommandLineOption;
+
+/**
+ * The jpackage goal lets you create a custom runtime image with
+ * the jpackage tool introduced in Java 13.
+ *
+ * &lt;p&gt;
+ * The main idea is to avoid being tied to project artifacts and allow the user
+ * to fully control the process of creating an image.
+ * &lt;/p&gt;
+ */
+@Mojo(
+    name = &quot;jpackage&quot;,
+    requiresDependencyResolution = ResolutionScope.RUNTIME
+//    defaultPhase = LifecyclePhase.VERIFY,
+//    requiresProject = true,
+//    aggregator = &lt;false|true&gt;,
+//    configurator = &quot;&lt;role hint&gt;&quot;,
+//    executionStrategy = &quot;&lt;once-per-session|always&gt;&quot;,
+//    inheritByDefault = &lt;true|false&gt;,
+//    instantiationStrategy = InstantiationStrategy.&lt;strategy&gt;,
+//    requiresDependencyCollection = ResolutionScope.&lt;scope&gt;,
+//    requiresDirectInvocation = &lt;false|true&gt;,
+//    requiresOnline = &lt;false|true&gt;,
+//    threadSafe = &lt;false|true&gt;,
+)
+@Execute(
+//    This will fork an alternate build lifecycle up to the specified phase
+//    before continuing to execute the current one.
+//    If no lifecycle is specified, Maven will use the lifecycle
+//    of the current build.
+//    phase = LifecyclePhase.VERIFY
+//
+//    This will execute the given goal before execution of this one.
+//    The goal name is specified using the prefix:goal notation.
+//    goal = &quot;prefix:goal&quot;
+//
+//    This will execute the given alternate lifecycle. A custom lifecycle
+//    can be defined in META-INF/maven/lifecycle.xml.
+//    lifecycle = &quot;&lt;lifecycle&gt;&quot;, phase=&quot;&lt;phase&gt;&quot;
+)
+<span class="fc" id="L98">public class JPackageMojo extends BaseToolMojo {</span>
+
+  /**
+   * The name of the subdirectory where the tool live.
+   */
+  private static final String TOOL_HOME_BIN = &quot;bin&quot;;
+
+  /**
+   * The tool name.
+   */
+  private static final String TOOL_NAME = &quot;jpackage&quot;;
+
+  /**
+   * Filename for temporary file contains the tool options.
+   */
+  private static final String OPTS_FILE = TOOL_NAME + &quot;.opts&quot;;
+
+  /**
+   * Filename of a module descriptor.
+   */
+  private static final String DESCRIPTOR_NAME = &quot;module-info.class&quot;;
+
+  /**
+   * Filename prefix for temporary file contains the launcher properties.
+   */
+  private static final String PROPS_PREFIX = &quot;launcher.&quot;;
+
+  /**
+   * Filename suffix for temporary file contains the launcher properties.
+   */
+  private static final String PROPS_SUFFIX = &quot;.properties&quot;;
+
+  /**
+   * The line ending pattern.
+   */
+  private static final String SPACES_PATTERN = &quot;\\s+&quot;;
+
+  /**
+   * The char that will used to wrap an option string.
+   */
+  private static final char WRAP_CHAR = '\'';
+
+  /**
+   * Error message pattern for unability to resolve file path.
+   */
+  private static final String ERROR_RESOLVE =
+      &quot;Error: Unable to resolve file path for {0} [{1}]&quot;;
+
+  /**
+   * List of temporary files.
+   */
+<span class="fc" id="L149">  private final List&lt;File&gt; tempFiles = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * Resolved project dependencies.
+   */
+  private ResolvePathsResult&lt;File&gt; projectDependencies;
+
+  /**
+   * Resolved main module descriptor.
+   */
+  private JavaModuleDescriptor mainModuleDescriptor;
+
+  /**
+   * JPMS location manager.
+   */
+  @Component
+  private LocationManager locationManager;
+
+  /**
+   * Specifies the path to the JDK home directory providing the tool needed.
+   */
+  @Parameter
+  private File toolhome;
+
+
+  // generic options
+
+
+  /**
+   * Specifies the location in which generated output files are placed.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--dest path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;${project.build.directory}/jpackage&quot;
+  )
+  private File dest;
+
+  /**
+   * Specifies the location in which temporary files are placed.
+   * If specified, the directory will not be removed upon the task
+   * completion and must be removed manually.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--temp path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File temp;
+
+  /**
+   * Specifies the type of package
+   * to create: { 'PLATFORM', 'IMAGE', 'EXE', 'MSI' }.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--type {app-image|exe|msi}&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;PLATFORM&quot;
+  )
+  private PackageType type;
+
+  /**
+   * Enable verbose tracing.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--verbose&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;false&quot;
+  )
+  private boolean verbose;
+
+  /**
+   * Specifies version of the application and/or package.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--app-version version&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String appversion;
+
+  /**
+   * Specifies copyright for the application.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--copyright copyright&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String copyright;
+
+  /**
+   * Specifies description of the application.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--description description&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String description;
+
+  /**
+   * Specifies the name of subdirectory relative to the destination
+   * directory in which files of generated application image are placed.
+   *
+   * &lt;em&gt;BUG: A name cannot contain spaces and unicode characters.&lt;/em&gt;
+   * &lt;em&gt;BUG: The names used to create the application image and
+   * the application installer must match.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--name directory-name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String name;
+
+  /**
+   * Specifies vendor of the application.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--vendor vendor&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String vendor;
+
+
+  // options for creating the application image
+
+
+  /**
+   * Specifies the location of the icon of the application launcher.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--icon path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File icon;
+
+  /**
+   * Specifies the location of the input directory that contains
+   * the files to be packaged. All files in the input directory
+   * will be packaged into the application image.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--input path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File input;
+
+
+  // options for creating the runtime image
+
+
+  /**
+   * Specifies the location of the predefined runtime image (result of jlink)
+   * that will be copied into the application image.
+   * If not specified, jpackage will run jlink to create
+   * the runtime image using options:
+   *   - &lt;code&gt;--strip-debug&lt;/code&gt;
+   *   - &lt;code&gt;--no-header-files&lt;/code&gt;
+   *   - &lt;code&gt;--no-man-pages&lt;/code&gt;
+   *   - &lt;code&gt;--strip-native-commands&lt;/code&gt;
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--runtime-image path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File runtimeimage;
+
+  /**
+   * Specifies the module path. The path where the jlink tool discovers
+   * observable modules: modular JAR files, JMOD files, exploded modules.
+   * If this option is not specified, then the default module path
+   * is $JAVA_HOME/jmods. This directory contains the java.base module
+   * and the other standard and JDK modules. If this option is specified
+   * but the java.base module cannot be resolved from it, then
+   * the jlink command appends $JAVA_HOME/jmods to the module path.
+   * Pass on --modulepath option to jlink.
+   *
+   * &lt;p&gt;
+   * pathelements - passed to jlink as is
+   * filesets - sets of files (without directories)
+   * dirsets - sets of directories (without files)
+   * dependencysets - sets of dependencies with specified includes and
+   *                  excludes patterns (glob: or regex:) for file names
+   *                  and regex patterns only for module names
+   * &lt;/p&gt;
+   *
+   * &lt;p&gt;&lt;pre&gt;
+   * &amp;lt;modulepath&amp;gt;
+   *   &amp;lt;pathelements&amp;gt;
+   *     &amp;lt;pathelement&amp;gt;mod.jar&amp;lt;/pathelement&amp;gt;
+   *     &amp;lt;pathelement&amp;gt;mod.jmod&amp;lt;/pathelement&amp;gt;
+   *     &amp;lt;pathelement&amp;gt;mods/exploded/mod&amp;lt;/pathelement&amp;gt;
+   *   &amp;lt;/pathelements&amp;gt;
+   *   &amp;lt;filesets&amp;gt;
+   *     &amp;lt;fileset&amp;gt;
+   *       &amp;lt;directory&amp;gt;${project.build.directory}&amp;lt;/directory&amp;gt;
+   *       &amp;lt;includes&amp;gt;
+   *         &amp;lt;include&amp;gt;*&amp;#42;/*&amp;lt;/include&amp;gt;
+   *       &amp;lt;/includes&amp;gt;
+   *       &amp;lt;excludes&amp;gt;
+   *         &amp;lt;exclude&amp;gt;*&amp;#42;/*Empty.jar&amp;lt;/exclude&amp;gt;
+   *       &amp;lt;/excludes&amp;gt;
+   *       &amp;lt;followSymlinks&amp;gt;false&amp;lt;/followSymlinks&amp;gt;
+   *     &amp;lt;/fileset&amp;gt;
+   *   &amp;lt;/filesets&amp;gt;
+   *   &amp;lt;dirsets&amp;gt;
+   *     &amp;lt;dirset&amp;gt;
+   *       &amp;lt;directory&amp;gt;target&amp;lt;/directory&amp;gt;
+   *       &amp;lt;includes&amp;gt;
+   *         &amp;lt;include&amp;gt;*&amp;#42;/*&amp;lt;/include&amp;gt;
+   *       &amp;lt;/includes&amp;gt;
+   *       &amp;lt;excludes&amp;gt;
+   *         &amp;lt;exclude&amp;gt;*&amp;#42;/*Test&amp;lt;/exclude&amp;gt;
+   *       &amp;lt;/excludes&amp;gt;
+   *       &amp;lt;followSymlinks&amp;gt;true&amp;lt;/followSymlinks&amp;gt;
+   *     &amp;lt;/dirset&amp;gt;
+   *   &amp;lt;/dirsets&amp;gt;
+   *   &amp;lt;dependencysets&amp;gt;
+   *     &amp;lt;dependencyset&amp;gt;
+   *       &amp;lt;includeoutput&amp;gt;false&amp;lt;/includeoutput&amp;gt;
+   *       &amp;lt;excludeautomatic&amp;gt;false&amp;lt;/excludeautomatic&amp;gt;
+   *       &amp;lt;includes&amp;gt;
+   *         &amp;lt;include&amp;gt;glob:*&amp;#42;/*.jar&amp;lt;/include&amp;gt;
+   *         &amp;lt;include&amp;gt;regex:foo-(bar|baz)-.*?\.jar&amp;lt;/include&amp;gt;
+   *       &amp;lt;/includes&amp;gt;
+   *       &amp;lt;includenames&amp;gt;
+   *         &amp;lt;includename&amp;gt;.*&amp;lt;/includename&amp;gt;
+   *       &amp;lt;/includenames&amp;gt;
+   *       &amp;lt;excludes&amp;gt;
+   *         &amp;lt;exclude&amp;gt;glob:*&amp;#42;/javafx.*Empty&amp;lt;/exclude&amp;gt;
+   *       &amp;lt;/excludes&amp;gt;
+   *       &amp;lt;excludenames&amp;gt;
+   *         &amp;lt;excludename&amp;gt;javafx\..+Empty&amp;lt;/excludename&amp;gt;
+   *       &amp;lt;/excludenames&amp;gt;
+   *     &amp;lt;/dependencyset&amp;gt;
+   *   &amp;lt;/dependencysets&amp;gt;
+   * &amp;lt;/modulepath&amp;gt;
+   * &lt;/pre&gt;&lt;/p&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--modulepath path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private ModulePath modulepath;
+
+  /**
+   * Specifies the modules names (names of root modules) to add to
+   * the runtime image. Their transitive dependencies will add too.
+   * This module list, along with the main module (if specified)
+   * will be passed to jlink as the --add-module argument.
+   * If not specified, either just the main module (if module is specified),
+   * or the default set of modules (if mainjar is specified) are used.
+   *
+   * &lt;p&gt;&lt;pre&gt;
+   * &amp;lt;addmodules&amp;gt;
+   *   &amp;lt;addmodule&amp;gt;java.base&amp;lt;/addmodule&amp;gt;
+   *   &amp;lt;addmodule&amp;gt;org.example.rootmodule&amp;lt;/addmodule&amp;gt;
+   * &amp;lt;/addmodules&amp;gt;
+   * &lt;/pre&gt;&lt;/p&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--add-modules module [, module...]&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private List&lt;String&gt; addmodules;
+
+  /**
+   * Link service provider modules and their dependencies.
+   * Pass on --bind-services option to jlink.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--bind-services&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;false&quot;
+  )
+  private boolean bindservices;
+
+
+  // options for creating the application launcher(s)
+
+
+  /**
+   * Specifies the main module (and optionally main class) of
+   * the application. This module must be located on the module path.
+   * When this option is specified, the main module will be linked
+   * in the Java runtime image. Either module or mainjar option
+   * can be specified but not both.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--module module-name[/class-name]&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String module;
+
+  /**
+   * Specifies the main JAR of the application, specified as a path
+   * relative to the input path, containing the main class.
+   * Either module or mainjar option can be specified but not both.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--main-jar jar-name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String mainjar;
+
+  /**
+   * Specifies the qualified name of the application main class to execute.
+   * This option can only be used if mainjar is specified.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--main-class class-name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String mainclass;
+
+  /**
+   * Specifies the command line arguments to pass to the main class
+   * if no command line arguments are given to the launcher.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--arguments args&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String arguments;
+
+  /**
+   * Specifies the options to pass to the Java runtime.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--java-options opts&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String javaoptions;
+
+  /**
+   * Specifies options are added to, or used to overwrite, the original
+   * command line options to build additional alternative launchers.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;&lt;pre&gt;
+   * &amp;lt;addlaunchers&amp;gt;
+   *   &amp;lt;addlauncher&amp;gt;
+   *     &amp;lt;name&amp;gt;launcher1&amp;lt;/name&amp;gt;
+   *     &amp;lt;file&amp;gt;config/jpackage/launcher1.properties&amp;lt;/file&amp;gt;
+   *     &amp;lt;module&amp;gt;mainModule1Name/mainClass1Name&amp;lt;/module&amp;gt;
+   *     &amp;lt;mainjar&amp;gt;mainJar1.jar&amp;lt;/mainjar&amp;gt;
+   *     &amp;lt;mainclass&amp;gt;mainClass1Name&amp;lt;/mainclass&amp;gt;
+   *     &amp;lt;arguments&amp;gt;--arg11 --arg12&amp;lt;/arguments&amp;gt;
+   *     &amp;lt;javaoptions&amp;gt;-Xms128m -Xmx1024m&amp;lt;/javaoptions&amp;gt;
+   *     &amp;lt;appversion&amp;gt;1.0.1&amp;lt;/appversion&amp;gt;
+   *     &amp;lt;icon&amp;gt;config/jpackage/launcher1.ico&amp;lt;/icon&amp;gt;
+   *     &amp;lt;winconsole&amp;gt;true&amp;lt;/winconsole&amp;gt;
+   *   &amp;lt;/addlauncher&amp;gt;
+   * &amp;lt;/addlaunchers&amp;gt;
+   * &lt;/pre&gt;&lt;/p&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--add-launcher name=path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private List&lt;Launcher&gt; addlaunchers;
+
+
+  // platform dependent option for creating the application launcher
+
+
+  /**
+   * Enable creating a console launcher for the application, should be
+   * specified for application which requires console interactions.
+   *
+   * &lt;p&gt;The jlink CLI is: &lt;code&gt;--win-console&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;false&quot;
+  )
+  private boolean winconsole;
+
+
+  // options for creating the application installable package
+
+
+  /**
+   * Specifies the location of the predefined application image that is used
+   * to build an installable package.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--app-image path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File appimage;
+
+  /**
+   * Specifies the location of a properties file that contains list of key,
+   * value pairs. The keys &quot;extension&quot;, &quot;mime-type&quot;, &quot;icon&quot;, and &quot;description&quot;
+   * can be used to describe the association.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--file-associations path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File fileassociations;
+
+  /**
+   * Specifies the relative sub-path under the default installation
+   * location of the application for Windows, or absolute path of the
+   * installation directory of the application for Mac or Linux.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--install-dir name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String installdir;
+
+  /**
+   * Specifies the location of a license file.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--license-file path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File licensefile;
+
+  /**
+   * Specifies the location of a resources directory that override
+   * jpackage resources. Icons, template files, and other resources
+   * of jpackage can be overridden by adding replacement resources
+   * to this directory.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--resource-dir path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File resourcedir;
+
+
+  // platform dependent options for creating the application
+  // installable package (Windows)
+
+
+  /**
+   * Enable adding a dialog to choose a directory in which
+   * the product is installed.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--win-dir-chooser&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;false&quot;
+  )
+  private boolean windirchooser;
+
+  /**
+   * Enable adding the application to the system menu.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--win-menu&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;false&quot;
+  )
+  private boolean winmenu;
+
+  /**
+   * Start menu group this application is placed in.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--win-menu-group name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String winmenugroup;
+
+  /**
+   * Enable requesting to perform an install on a per-user basis.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--win-per-user-install&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;false&quot;
+  )
+  private boolean winperuserinstall;
+
+  /**
+   * Enable creating a desktop shortcut for the application.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--win-shortcut&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter(
+      defaultValue = &quot;false&quot;
+  )
+  private boolean winshortcut;
+
+  /**
+   * UUID associated with upgrades for this package.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--win-upgrade-uuid uuid&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String winupgradeuuid;
+
+
+  // platform dependent options for creating the application
+  // installable package (Mac)
+
+
+  /**
+   * An identifier that uniquely identifies the application for macOS.
+   * Defaults to the main class name. May only use alphanumeric (A-Z,a-z,0-9),
+   * hyphen (-), and period (.) characters.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--mac-package-identifier id&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String macpackageidentifier;
+
+  /**
+   * Name of the application as it appears in the Menu Bar.
+   * This can be different from the application name.
+   * This name must be less than 16 characters long and be suitable for
+   * displaying in the menu bar and the application Info window.
+   * Defaults to the application name.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--mac-package-name name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String macpackagename;
+
+  /**
+   * When signing the application package, this value is prefixed
+   * to all components that need to be signed that don't have
+   * an existing package identifier.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--mac-package-signing-prefix prefix&lt;/code&gt;
+   * &lt;/p&gt;
+   */
+  @Parameter
+  private String macpackagesigningprefix;
+
+  /**
+   * Request that the package be signed.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--mac-sign&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private boolean macsign;
+
+  /**
+   * Path of the keychain to search for the signing identity
+   * (absolute path or relative to the current directory).
+   * If not specified, the standard keychains are used.
+   *
+   * &lt;em&gt;BUG: A path cannot contain spaces and unicode characters.&lt;/em&gt;
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--mac-signing-keychain path&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private File macsigningkeychain;
+
+  /**
+   * Team name portion in Apple signing identities' names.
+   * For example &quot;Developer ID Application: &quot;.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--mac-signing-key-user-name name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String macsigningkeyusername;
+
+
+  // platform dependent options for creating the application
+  // installable package (Linux)
+
+
+  /**
+   * Name for Linux package, defaults to the application name.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--linux-package-name name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String linuxpackagename;
+
+  /**
+   * Maintainer for .deb package.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--linux-deb-maintainer email&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String linuxdebmaintainer;
+
+  /**
+   * Menu group this application is placed in.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--linux-menu-group name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String linuxmenugroup;
+
+  /**
+   * Required packages or capabilities for the application.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--linux-package-deps&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private boolean linuxpackagedeps;
+
+  /**
+   * Type of the license (&quot;License: name&quot; of the RPM .spec).
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--linux-rpm-license-type name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String linuxrpmlicensetype;
+
+  /**
+   * Release value of the RPM name.spec file or Debian revision value
+   * of the DEB control file.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--linux-app-release name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String linuxapprelease;
+
+  /**
+   * Group value of the RPM name.spec file or Section value
+   * of DEB control file.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--linux-app-category name&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private String linuxappcategory;
+
+  /**
+   * Creates a shortcut for the application.
+   *
+   * &lt;p&gt;The jpackage CLI is: &lt;code&gt;--linux-shortcut&lt;/code&gt;&lt;/p&gt;
+   */
+  @Parameter
+  private boolean linuxshortcut;
+
+  /**
+   * Process options.
+   *
+   * @param cmdLine the command line builder
+   *
+   * @throws MojoExecutionException if any errors occurred
+   */
+  private void processOptions(final CommandLineBuilder cmdLine)
+      throws MojoExecutionException {
+<span class="nc" id="L786">    CommandLineOption opt = null;</span>
+    // dest
+<span class="nc" id="L788">    opt = cmdLine.createOpt();</span>
+<span class="nc" id="L789">    opt.createArg().setValue(&quot;--dest&quot;);</span>
+    try {
+<span class="nc" id="L791">      opt.createArg().setValue(dest.getCanonicalPath());</span>
+<span class="nc" id="L792">    } catch (IOException ex) {</span>
+<span class="nc" id="L793">      throw new MojoExecutionException(MessageFormat.format(</span>
+          ERROR_RESOLVE,
+          &quot;--dest&quot;,
+<span class="nc" id="L796">          dest.toString()), ex);</span>
+<span class="nc" id="L797">    }</span>
+    // temp
+<span class="nc bnc" id="L799" title="All 2 branches missed.">    if (temp != null) {</span>
+<span class="nc" id="L800">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L801">      opt.createArg().setValue(&quot;--temp&quot;);</span>
+      try {
+<span class="nc" id="L803">        opt.createArg().setValue(temp.getCanonicalPath());</span>
+<span class="nc" id="L804">      } catch (IOException ex) {</span>
+<span class="nc" id="L805">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--temp&quot;,
+<span class="nc" id="L808">            temp.toString()), ex);</span>
+<span class="nc" id="L809">      }</span>
+    }
+    // type
+<span class="nc bnc" id="L812" title="All 4 branches missed.">    if (type != null &amp;&amp; !type.equals(PackageType.PLATFORM)) {</span>
+<span class="nc" id="L813">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L814">      opt.createArg().setValue(&quot;--type&quot;);</span>
+<span class="nc bnc" id="L815" title="All 4 branches missed.">      switch (type) {</span>
+        case IMAGE:
+<span class="nc" id="L817">          opt.createArg().setValue(&quot;app-image&quot;);</span>
+<span class="nc" id="L818">          break;</span>
+        case EXE:
+<span class="nc" id="L820">          opt.createArg().setValue(&quot;exe&quot;);</span>
+<span class="nc" id="L821">          break;</span>
+        case MSI:
+<span class="nc" id="L823">          opt.createArg().setValue(&quot;msi&quot;);</span>
+<span class="nc" id="L824">          break;</span>
+        default:
+          // skip
+      }
+    }
+    // verbose
+<span class="nc bnc" id="L830" title="All 2 branches missed.">    if (verbose) {</span>
+<span class="nc" id="L831">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L832">      opt.createArg().setValue(&quot;--verbose&quot;);</span>
+    }
+    // appversion
+<span class="nc bnc" id="L835" title="All 2 branches missed.">    if (!StringUtils.isBlank(appversion)) {</span>
+<span class="nc" id="L836">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L837">      opt.createArg().setValue(&quot;--app-version&quot;);</span>
+<span class="nc" id="L838">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          appversion, WRAP_CHAR));
+    }
+    // copyright
+<span class="nc bnc" id="L842" title="All 2 branches missed.">    if (!StringUtils.isBlank(copyright)) {</span>
+<span class="nc" id="L843">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L844">      opt.createArg().setValue(&quot;--copyright&quot;);</span>
+<span class="nc" id="L845">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          copyright, WRAP_CHAR));
+    }
+    // description
+<span class="nc bnc" id="L849" title="All 2 branches missed.">    if (!StringUtils.isBlank(description)) {</span>
+<span class="nc" id="L850">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L851">      opt.createArg().setValue(&quot;--description&quot;);</span>
+<span class="nc" id="L852">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+<span class="nc" id="L853">          description.replaceAll(SPACES_PATTERN, &quot; &quot;), WRAP_CHAR));</span>
+    }
+    // name
+<span class="nc bnc" id="L856" title="All 2 branches missed.">    if (!StringUtils.isBlank(name)) {</span>
+<span class="nc" id="L857">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L858">      opt.createArg().setValue(&quot;--name&quot;);</span>
+<span class="nc" id="L859">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          name, WRAP_CHAR));
+    }
+    // vendor
+<span class="nc bnc" id="L863" title="All 2 branches missed.">    if (!StringUtils.isBlank(vendor)) {</span>
+<span class="nc" id="L864">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L865">      opt.createArg().setValue(&quot;--vendor&quot;);</span>
+<span class="nc" id="L866">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          vendor, WRAP_CHAR));
+    }
+    // icon
+<span class="nc bnc" id="L870" title="All 2 branches missed.">    if (icon != null) {</span>
+<span class="nc" id="L871">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L872">      opt.createArg().setValue(&quot;--icon&quot;);</span>
+      try {
+<span class="nc" id="L874">        opt.createArg().setValue(icon.getCanonicalPath());</span>
+<span class="nc" id="L875">      } catch (IOException ex) {</span>
+<span class="nc" id="L876">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--icon&quot;,
+<span class="nc" id="L879">            icon.toString()), ex);</span>
+<span class="nc" id="L880">      }</span>
+    }
+    // input
+<span class="nc bnc" id="L883" title="All 2 branches missed.">    if (input != null) {</span>
+<span class="nc" id="L884">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L885">      opt.createArg().setValue(&quot;--input&quot;);</span>
+      try {
+<span class="nc" id="L887">        opt.createArg().setValue(input.getCanonicalPath());</span>
+<span class="nc" id="L888">      } catch (IOException ex) {</span>
+<span class="nc" id="L889">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--input&quot;,
+<span class="nc" id="L892">            input.toString()), ex);</span>
+<span class="nc" id="L893">      }</span>
+    }
+    // runtimeimage
+<span class="nc bnc" id="L896" title="All 2 branches missed.">    if (runtimeimage != null) {</span>
+<span class="nc" id="L897">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L898">      opt.createArg().setValue(&quot;--runtime-image&quot;);</span>
+      try {
+<span class="nc" id="L900">        opt.createArg().setValue(runtimeimage.getCanonicalPath());</span>
+<span class="nc" id="L901">      } catch (IOException ex) {</span>
+<span class="nc" id="L902">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--runtime-image&quot;,
+<span class="nc" id="L905">            runtimeimage.toString()), ex);</span>
+<span class="nc" id="L906">      }</span>
+    }
+    // module
+<span class="nc bnc" id="L909" title="All 2 branches missed.">    if (!StringUtils.isBlank(module)) {</span>
+<span class="nc" id="L910">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L911">      opt.createArg().setValue(&quot;--module&quot;);</span>
+<span class="nc" id="L912">      opt.createArg().setValue(StringUtils.stripToEmpty(</span>
+          module));
+    }
+    // mainjar
+<span class="nc bnc" id="L916" title="All 2 branches missed.">    if (!StringUtils.isBlank(mainjar)) {</span>
+<span class="nc" id="L917">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L918">      opt.createArg().setValue(&quot;--main-jar&quot;);</span>
+<span class="nc" id="L919">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          mainjar, WRAP_CHAR));
+    }
+    // mainclass
+<span class="nc bnc" id="L923" title="All 2 branches missed.">    if (!StringUtils.isBlank(mainclass)) {</span>
+<span class="nc" id="L924">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L925">      opt.createArg().setValue(&quot;--main-class&quot;);</span>
+<span class="nc" id="L926">      opt.createArg().setValue(StringUtils.stripToEmpty(</span>
+          mainclass));
+    }
+    // arguments
+<span class="nc bnc" id="L930" title="All 2 branches missed.">    if (!StringUtils.isBlank(arguments)) {</span>
+<span class="nc" id="L931">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L932">      opt.createArg().setValue(&quot;--arguments&quot;);</span>
+<span class="nc" id="L933">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          arguments, WRAP_CHAR));
+    }
+    // javaoptions
+<span class="nc bnc" id="L937" title="All 2 branches missed.">    if (!StringUtils.isBlank(javaoptions)) {</span>
+<span class="nc" id="L938">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L939">      opt.createArg().setValue(&quot;--java-options&quot;);</span>
+<span class="nc" id="L940">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          javaoptions, WRAP_CHAR));
+    }
+    // addlaunchers
+<span class="nc bnc" id="L944" title="All 4 branches missed.">    if (addlaunchers != null &amp;&amp; !addlaunchers.isEmpty()) {</span>
+<span class="nc bnc" id="L945" title="All 2 branches missed.">      for (final Launcher addlauncher : addlaunchers) {</span>
+<span class="nc" id="L946">        final String name = StringUtils.stripToEmpty(addlauncher.getName());</span>
+<span class="nc bnc" id="L947" title="All 2 branches missed.">        if (!StringUtils.isBlank(name)) {</span>
+<span class="nc" id="L948">          final File file = processLauncher(addlauncher);</span>
+<span class="nc" id="L949">          tempFiles.add(file);</span>
+<span class="nc" id="L950">          opt = cmdLine.createOpt();</span>
+<span class="nc" id="L951">          opt.createArg().setValue(&quot;--add-launcher&quot;);</span>
+          try {
+<span class="nc" id="L953">            opt.createArg().setValue(name + &quot;=&quot; + file.getCanonicalPath());</span>
+<span class="nc" id="L954">          } catch (IOException ex) {</span>
+<span class="nc" id="L955">            throw new MojoExecutionException(MessageFormat.format(</span>
+                ERROR_RESOLVE,
+                &quot;--add-launcher&quot;,
+<span class="nc" id="L958">                file.toString()), ex);</span>
+<span class="nc" id="L959">          }</span>
+        }
+<span class="nc" id="L961">      }</span>
+    }
+    // winconsole
+<span class="nc bnc" id="L964" title="All 2 branches missed.">    if (winconsole) {</span>
+<span class="nc" id="L965">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L966">      opt.createArg().setValue(&quot;--win-console&quot;);</span>
+    }
+    // appimage
+<span class="nc bnc" id="L969" title="All 2 branches missed.">    if (appimage != null) {</span>
+<span class="nc" id="L970">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L971">      opt.createArg().setValue(&quot;--app-image&quot;);</span>
+      try {
+<span class="nc" id="L973">        opt.createArg().setValue(appimage.getCanonicalPath());</span>
+<span class="nc" id="L974">      } catch (IOException ex) {</span>
+<span class="nc" id="L975">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--app-image&quot;,
+<span class="nc" id="L978">            appimage.toString()), ex);</span>
+<span class="nc" id="L979">      }</span>
+    }
+    // fileassociations
+<span class="nc bnc" id="L982" title="All 2 branches missed.">    if (fileassociations != null) {</span>
+<span class="nc" id="L983">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L984">      opt.createArg().setValue(&quot;--file-associations&quot;);</span>
+      try {
+<span class="nc" id="L986">        opt.createArg().setValue(fileassociations.getCanonicalPath());</span>
+<span class="nc" id="L987">      } catch (IOException ex) {</span>
+<span class="nc" id="L988">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--file-associations&quot;,
+<span class="nc" id="L991">            fileassociations.toString()), ex);</span>
+<span class="nc" id="L992">      }</span>
+    }
+    // installdir
+<span class="nc bnc" id="L995" title="All 2 branches missed.">    if (!StringUtils.isBlank(installdir)) {</span>
+<span class="nc" id="L996">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L997">      opt.createArg().setValue(&quot;--install-dir&quot;);</span>
+<span class="nc" id="L998">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          installdir, WRAP_CHAR));
+    }
+    // licensefile
+<span class="nc bnc" id="L1002" title="All 2 branches missed.">    if (licensefile != null) {</span>
+<span class="nc" id="L1003">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1004">      opt.createArg().setValue(&quot;--license-file&quot;);</span>
+      try {
+<span class="nc" id="L1006">        opt.createArg().setValue(licensefile.getCanonicalPath());</span>
+<span class="nc" id="L1007">      } catch (IOException ex) {</span>
+<span class="nc" id="L1008">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--license-file&quot;,
+<span class="nc" id="L1011">            licensefile.toString()), ex);</span>
+<span class="nc" id="L1012">      }</span>
+    }
+    // resourcedir
+<span class="nc bnc" id="L1015" title="All 2 branches missed.">    if (resourcedir != null) {</span>
+<span class="nc" id="L1016">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1017">      opt.createArg().setValue(&quot;--resource-dir&quot;);</span>
+      try {
+<span class="nc" id="L1019">        opt.createArg().setValue(resourcedir.getCanonicalPath());</span>
+<span class="nc" id="L1020">      } catch (IOException ex) {</span>
+<span class="nc" id="L1021">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--resource-dir&quot;,
+<span class="nc" id="L1024">            resourcedir.toString()), ex);</span>
+<span class="nc" id="L1025">      }</span>
+    }
+    // windirchooser
+<span class="nc bnc" id="L1028" title="All 2 branches missed.">    if (windirchooser) {</span>
+<span class="nc" id="L1029">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1030">      opt.createArg().setValue(&quot;--win-dir-chooser&quot;);</span>
+    }
+    // winmenu
+<span class="nc bnc" id="L1033" title="All 2 branches missed.">    if (winmenu) {</span>
+<span class="nc" id="L1034">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1035">      opt.createArg().setValue(&quot;--win-menu&quot;);</span>
+    }
+    // winmenugroup
+<span class="nc bnc" id="L1038" title="All 2 branches missed.">    if (!StringUtils.isBlank(winmenugroup)) {</span>
+<span class="nc" id="L1039">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1040">      opt.createArg().setValue(&quot;--win-menu-group&quot;);</span>
+<span class="nc" id="L1041">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          winmenugroup, WRAP_CHAR));
+    }
+    // winperuserinstall
+<span class="nc bnc" id="L1045" title="All 2 branches missed.">    if (winperuserinstall) {</span>
+<span class="nc" id="L1046">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1047">      opt.createArg().setValue(&quot;--win-per-user-install&quot;);</span>
+    }
+    // winshortcut
+<span class="nc bnc" id="L1050" title="All 2 branches missed.">    if (winshortcut) {</span>
+<span class="nc" id="L1051">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1052">      opt.createArg().setValue(&quot;--win-shortcut&quot;);</span>
+    }
+    // winupgradeuuid
+<span class="nc bnc" id="L1055" title="All 2 branches missed.">    if (!StringUtils.isBlank(winupgradeuuid)) {</span>
+<span class="nc" id="L1056">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1057">      opt.createArg().setValue(&quot;--win-upgrade-uuid&quot;);</span>
+<span class="nc" id="L1058">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          winupgradeuuid, WRAP_CHAR));
+    }
+    // macpackageidentifier
+<span class="nc bnc" id="L1062" title="All 2 branches missed.">    if (!StringUtils.isBlank(macpackageidentifier)) {</span>
+<span class="nc" id="L1063">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1064">      opt.createArg().setValue(&quot;--mac-package-identifier&quot;);</span>
+<span class="nc" id="L1065">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          macpackageidentifier, WRAP_CHAR));
+    }
+    // macpackagename
+<span class="nc bnc" id="L1069" title="All 2 branches missed.">    if (!StringUtils.isBlank(macpackagename)) {</span>
+<span class="nc" id="L1070">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1071">      opt.createArg().setValue(&quot;--mac-package-name&quot;);</span>
+<span class="nc" id="L1072">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          macpackagename, WRAP_CHAR));
+    }
+    // macpackagesigningprefix
+<span class="nc bnc" id="L1076" title="All 2 branches missed.">    if (!StringUtils.isBlank(macpackagesigningprefix)) {</span>
+<span class="nc" id="L1077">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1078">      opt.createArg().setValue(&quot;--mac-package-signing-prefix&quot;);</span>
+<span class="nc" id="L1079">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          macpackagesigningprefix, WRAP_CHAR));
+    }
+    // macsign
+<span class="nc bnc" id="L1083" title="All 2 branches missed.">    if (macsign) {</span>
+<span class="nc" id="L1084">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1085">      opt.createArg().setValue(&quot;--mac-sign&quot;);</span>
+    }
+    // macsigningkeychain
+<span class="nc bnc" id="L1088" title="All 2 branches missed.">    if (macsigningkeychain != null) {</span>
+<span class="nc" id="L1089">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1090">      opt.createArg().setValue(&quot;--mac-signing-keychain&quot;);</span>
+      try {
+<span class="nc" id="L1092">        opt.createArg().setValue(macsigningkeychain.getCanonicalPath());</span>
+<span class="nc" id="L1093">      } catch (IOException ex) {</span>
+<span class="nc" id="L1094">        throw new MojoExecutionException(MessageFormat.format(</span>
+            ERROR_RESOLVE,
+            &quot;--mac-signing-keychain&quot;,
+<span class="nc" id="L1097">            macsigningkeychain.toString()), ex);</span>
+<span class="nc" id="L1098">      }</span>
+    }
+    // macsigningkeyusername
+<span class="nc bnc" id="L1101" title="All 2 branches missed.">    if (!StringUtils.isBlank(macsigningkeyusername)) {</span>
+<span class="nc" id="L1102">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1103">      opt.createArg().setValue(&quot;--mac-signing-key-user-name&quot;);</span>
+<span class="nc" id="L1104">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          macsigningkeyusername, WRAP_CHAR));
+    }
+    // linuxpackagename
+<span class="nc bnc" id="L1108" title="All 2 branches missed.">    if (!StringUtils.isBlank(linuxpackagename)) {</span>
+<span class="nc" id="L1109">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1110">      opt.createArg().setValue(&quot;--linux-package-name&quot;);</span>
+<span class="nc" id="L1111">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          linuxpackagename, WRAP_CHAR));
+    }
+    // linuxdebmaintainer
+<span class="nc bnc" id="L1115" title="All 2 branches missed.">    if (!StringUtils.isBlank(linuxdebmaintainer)) {</span>
+<span class="nc" id="L1116">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1117">      opt.createArg().setValue(&quot;--linux-deb-maintainer&quot;);</span>
+<span class="nc" id="L1118">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          linuxdebmaintainer, WRAP_CHAR));
+    }
+    // linuxmenugroup
+<span class="nc bnc" id="L1122" title="All 2 branches missed.">    if (!StringUtils.isBlank(linuxmenugroup)) {</span>
+<span class="nc" id="L1123">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1124">      opt.createArg().setValue(&quot;--linux-menu-group&quot;);</span>
+<span class="nc" id="L1125">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          linuxmenugroup, WRAP_CHAR));
+    }
+    // linuxpackagedeps
+<span class="nc bnc" id="L1129" title="All 2 branches missed.">    if (linuxpackagedeps) {</span>
+<span class="nc" id="L1130">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1131">      opt.createArg().setValue(&quot;--linux-package-deps&quot;);</span>
+    }
+    // linuxrpmlicensetype
+<span class="nc bnc" id="L1134" title="All 2 branches missed.">    if (!StringUtils.isBlank(linuxrpmlicensetype)) {</span>
+<span class="nc" id="L1135">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1136">      opt.createArg().setValue(&quot;--linux-rpm-license-type&quot;);</span>
+<span class="nc" id="L1137">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          linuxrpmlicensetype, WRAP_CHAR));
+    }
+    // linuxapprelease
+<span class="nc bnc" id="L1141" title="All 2 branches missed.">    if (!StringUtils.isBlank(linuxapprelease)) {</span>
+<span class="nc" id="L1142">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1143">      opt.createArg().setValue(&quot;--linux-app-release&quot;);</span>
+<span class="nc" id="L1144">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          linuxapprelease, WRAP_CHAR));
+    }
+    // linuxappcategory
+<span class="nc bnc" id="L1148" title="All 2 branches missed.">    if (!StringUtils.isBlank(linuxappcategory)) {</span>
+<span class="nc" id="L1149">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1150">      opt.createArg().setValue(&quot;--linux-app-category&quot;);</span>
+<span class="nc" id="L1151">      opt.createArg().setValue(PluginUtils.wrapOpt(</span>
+          linuxappcategory, WRAP_CHAR));
+    }
+    // linuxshortcut
+<span class="nc bnc" id="L1155" title="All 2 branches missed.">    if (linuxshortcut) {</span>
+<span class="nc" id="L1156">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1157">      opt.createArg().setValue(&quot;--linux-shortcut&quot;);</span>
+    }
+<span class="nc" id="L1159">  }</span>
+
+  /**
+   * Process additional launcher.
+   * Create a temporary file contains the efective launcher properties.
+   *
+   * @param launcher the additional launcher
+   *
+   * @return the temporary file contains the efective launcher properties
+   *
+   * @throws MojoExecutionException if any errors occurred
+   */
+  private File processLauncher(final Launcher launcher)
+      throws MojoExecutionException {
+<span class="nc" id="L1173">    final String name = launcher.getName();</span>
+    // get properties
+    Properties props;
+    try {
+<span class="nc" id="L1177">      props = launcher.getProperties(getCharset());</span>
+<span class="nc" id="L1178">    } catch (IOException ex) {</span>
+<span class="nc" id="L1179">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: Unable to read properties for launcher: [{0}]&quot;,
+          name), ex);
+<span class="nc" id="L1182">    }</span>
+    // create a temporary properties file
+    File file;
+    try {
+<span class="nc" id="L1186">      file = Files.createTempFile(getBuildDir().toPath(),</span>
+<span class="nc" id="L1187">          PROPS_PREFIX, PROPS_SUFFIX).toFile();</span>
+<span class="nc" id="L1188">    } catch (IOException ex) {</span>
+<span class="nc" id="L1189">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: Unable to create temporary file for launcher: [{0}]&quot;,
+          name), ex);
+<span class="nc" id="L1192">    }</span>
+    // save properties to the temporary file
+<span class="nc" id="L1194">    try (BufferedWriter bw =</span>
+<span class="nc" id="L1195">        Files.newBufferedWriter(file.toPath(), getCharset())) {</span>
+<span class="nc" id="L1196">      props.store(bw, null);</span>
+<span class="nc" id="L1197">    } catch (IOException ex) {</span>
+<span class="nc" id="L1198">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: Unable to write temporary file for launcher: [{0}]&quot;,
+          name), ex);
+<span class="nc" id="L1201">    }</span>
+<span class="nc bnc" id="L1202" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1203">      getLog().debug(MessageFormat.format(</span>
+          &quot;Found additional launcher: [{0}]&quot;, name)
+<span class="nc" id="L1205">          + System.lineSeparator()</span>
+<span class="nc" id="L1206">          + props.toString());</span>
+    }
+<span class="nc" id="L1208">    return file;</span>
+  }
+
+  /**
+   * Resolve project dependencies.
+   *
+   * @return map of the resolved project dependencies
+   *
+   * @throws MojoExecutionException if any errors occurred while resolving
+   *                                dependencies
+   */
+  private ResolvePathsResult&lt;File&gt; resolveDependencies()
+      throws MojoExecutionException {
+
+    // get project artifacts - all dependencies that this project has,
+    // including transitive ones (depends on what phases have run)
+<span class="nc" id="L1224">    final Set&lt;Artifact&gt; artifacts = getProject().getArtifacts();</span>
+<span class="nc bnc" id="L1225" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1226">      getLog().debug(PluginUtils.getArtifactSetDebugInfo(artifacts));</span>
+    }
+
+    // create a list of the paths which will be resolved
+<span class="nc" id="L1230">    final List&lt;File&gt; paths = new ArrayList&lt;&gt;();</span>
+
+    // add the project output directory
+<span class="nc" id="L1233">    paths.add(getOutputDir());</span>
+
+    // SCOPE_COMPILE  - This is the default scope, used if none is specified.
+    //                  Compile dependencies are available in all classpaths.
+    //                  Furthermore, those dependencies are propagated to
+    //                  dependent projects.
+    // SCOPE_PROVIDED - This is much like compile, but indicates you expect
+    //                  the JDK or a container to provide it at runtime.
+    //                  It is only available on the compilation and
+    //                  test classpath, and is not transitive.
+    // SCOPE_SYSTEM   - This scope is similar to provided except that you
+    //                  have to provide the JAR which contains it explicitly.
+    //                  The artifact is always available and is not looked up
+    //                  in a repository.    
+    // SCOPE_RUNTIME  - This scope indicates that the dependency is not
+    //                  required for compilation, but is for execution.
+    //                  It is in the runtime and test classpaths, but not
+    //                  the compile classpath.
+    // SCOPE_TEST     - This scope indicates that the dependency is not
+    //                  required for normal use of the application, and is
+    //                  only available for the test compilation and execution
+    //                  phases. It is not transitive.
+    // SCOPE_IMPORT   - This scope indicates that the dependency is a managed
+    //                  POM dependency i.e. only other POM into
+    //                  the dependencyManagement section.
+
+    // [ !SCOPE_TEST ] add the project artifacts files
+<span class="nc" id="L1260">    paths.addAll(artifacts.stream()</span>
+<span class="nc bnc" id="L1261" title="All 4 branches missed.">        .filter(a -&gt; a != null &amp;&amp; !Artifact.SCOPE_TEST.equals(a.getScope()))</span>
+<span class="nc" id="L1262">        .map(a -&gt; a.getFile())</span>
+<span class="nc" id="L1263">        .collect(Collectors.toList()));</span>
+
+    // [ SCOPE_SYSTEM ] add the project system dependencies
+    // getSystemPath() is used only if the dependency scope is system
+<span class="nc" id="L1267">    paths.addAll(getProject().getDependencies().stream()</span>
+<span class="nc bnc" id="L1268" title="All 4 branches missed.">        .filter(d -&gt; d != null &amp;&amp; !StringUtils.isBlank(d.getSystemPath()))</span>
+<span class="nc" id="L1269">        .map(d -&gt; new File(StringUtils.stripToEmpty(d.getSystemPath())))</span>
+<span class="nc" id="L1270">        .collect(Collectors.toList()));</span>
+
+    // create request contains all information
+    // required to analyze the project
+<span class="nc" id="L1274">    final ResolvePathsRequest&lt;File&gt; request =</span>
+<span class="nc" id="L1275">        ResolvePathsRequest.ofFiles(paths);</span>
+
+    // this is used to resolve main module descriptor
+<span class="nc" id="L1278">    final File descriptorFile =</span>
+<span class="nc" id="L1279">        getOutputDir().toPath().resolve(DESCRIPTOR_NAME).toFile();</span>
+<span class="nc bnc" id="L1280" title="All 4 branches missed.">    if (descriptorFile.exists() &amp;&amp; !descriptorFile.isDirectory()) {</span>
+<span class="nc" id="L1281">      request.setMainModuleDescriptor(descriptorFile);</span>
+    }
+
+    // this is used to extract the module name
+<span class="nc bnc" id="L1285" title="All 2 branches missed.">    if (getToolHomeDirectory() != null) {</span>
+<span class="nc" id="L1286">      request.setJdkHome(getToolHomeDirectory());</span>
+    }
+
+    // resolve project dependencies
+    try {
+<span class="nc" id="L1291">      return locationManager.resolvePaths(request);</span>
+<span class="nc" id="L1292">    } catch (IOException ex) {</span>
+<span class="nc" id="L1293">      throw new MojoExecutionException(</span>
+          &quot;Error: Unable to resolve project dependencies&quot;, ex);
+    }
+
+  }
+
+  /**
+   * Fetch the resolved main module descriptor.
+   *
+   * @return main module descriptor or null if it not exists
+   */
+  private JavaModuleDescriptor fetchMainModuleDescriptor() {
+<span class="nc" id="L1305">    final JavaModuleDescriptor descriptor =</span>
+<span class="nc" id="L1306">        projectDependencies.getMainModuleDescriptor();</span>
+<span class="nc bnc" id="L1307" title="All 2 branches missed.">    if (descriptor == null) {</span>
+      // detected that the project is non modular
+<span class="nc bnc" id="L1309" title="All 2 branches missed.">      if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L1310">        getLog().warn(&quot;The main module descriptor not found&quot;);</span>
+      }
+    } else {
+<span class="nc bnc" id="L1313" title="All 2 branches missed.">      if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1314">        getLog().debug(MessageFormat.format(</span>
+<span class="nc" id="L1315">            &quot;Found the main module descriptor: [{0}]&quot;, descriptor.name()));</span>
+      }
+    }
+<span class="nc" id="L1318">    return descriptor;</span>
+  }
+
+  /**
+   * Fetch path exceptions for every modulename which resolution failed.
+   *
+   * @return pairs of path exception file and cause
+   */
+  private Map&lt;File, String&gt; fetchPathExceptions() {
+<span class="nc" id="L1327">    return projectDependencies.getPathExceptions()</span>
+<span class="nc" id="L1328">        .entrySet().stream()</span>
+<span class="nc bnc" id="L1329" title="All 4 branches missed.">        .filter(entry -&gt; entry != null &amp;&amp; entry.getKey() != null)</span>
+<span class="nc" id="L1330">        .collect(Collectors.toMap(</span>
+<span class="nc" id="L1331">            entry -&gt; entry.getKey(),</span>
+<span class="nc" id="L1332">            entry -&gt; PluginUtils.getThrowableCause(entry.getValue())</span>
+        ));
+  }
+
+  /**
+   * Fetch classpath elements.
+   *
+   * @return classpath elements
+   */
+  private List&lt;File&gt; fetchClasspathElements() {
+<span class="nc" id="L1342">    final List&lt;File&gt; result = projectDependencies.getClasspathElements()</span>
+<span class="nc" id="L1343">        .stream()</span>
+<span class="nc" id="L1344">        .filter(Objects::nonNull)</span>
+<span class="nc" id="L1345">        .collect(Collectors.toList());</span>
+<span class="nc bnc" id="L1346" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1347">      getLog().debug(&quot;Found classpath elements: &quot; + result.size()</span>
+<span class="nc" id="L1348">          + System.lineSeparator()</span>
+<span class="nc" id="L1349">          + result.stream()</span>
+<span class="nc" id="L1350">              .map(file -&gt; file.toString())</span>
+<span class="nc" id="L1351">              .collect(Collectors.joining(System.lineSeparator())));</span>
+    }
+<span class="nc" id="L1353">    return result;</span>
+  }
+
+  /**
+   * Fetch modulepath elements.
+   *
+   * @return modulepath elements
+   */
+  private List&lt;File&gt; fetchModulepathElements() {
+<span class="nc" id="L1362">    final List&lt;File&gt; result = projectDependencies.getModulepathElements()</span>
+<span class="nc" id="L1363">        .keySet()</span>
+<span class="nc" id="L1364">        .stream()</span>
+<span class="nc" id="L1365">        .filter(Objects::nonNull)</span>
+<span class="nc" id="L1366">        .collect(Collectors.toList());</span>
+<span class="nc bnc" id="L1367" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1368">      getLog().debug(&quot;Found modulepath elements: &quot; + result.size()</span>
+<span class="nc" id="L1369">          + System.lineSeparator()</span>
+<span class="nc" id="L1370">          + projectDependencies.getModulepathElements().entrySet().stream()</span>
+<span class="nc bnc" id="L1371" title="All 4 branches missed.">              .filter(entry -&gt; entry != null &amp;&amp; entry.getKey() != null)</span>
+<span class="nc" id="L1372">              .map(entry -&gt; entry.getKey().toString()</span>
+<span class="nc bnc" id="L1373" title="All 2 branches missed.">                  + (ModuleNameSource.FILENAME.equals(entry.getValue())</span>
+<span class="nc" id="L1374">                      ? System.lineSeparator()</span>
+                          + &quot;[!] Detected 'requires' filename based &quot;
+                          + &quot;automatic module&quot;
+<span class="nc" id="L1377">                          + System.lineSeparator()</span>
+                          + &quot;[!] Please don't publish this project to &quot;
+                          + &quot;a public artifact repository&quot;
+<span class="nc" id="L1380">                          + System.lineSeparator()</span>
+                          + (mainModuleDescriptor != null
+<span class="nc bnc" id="L1382" title="All 4 branches missed.">                              &amp;&amp; mainModuleDescriptor.exports().isEmpty()</span>
+<span class="nc" id="L1383">                                  ? &quot;[!] APPLICATION&quot;</span>
+<span class="nc" id="L1384">                                  : &quot;[!] LIBRARY&quot;)</span>
+<span class="nc" id="L1385">                      : &quot;&quot;))</span>
+<span class="nc" id="L1386">              .collect(Collectors.joining(System.lineSeparator())));</span>
+    }
+<span class="nc" id="L1388">    return result;</span>
+  }
+
+  /**
+   * Get path from the pathelements parameter.
+   *
+   * @return path contains parameter elements
+   */
+  private String getPathElements() {
+<span class="nc" id="L1397">    String result = null;</span>
+<span class="nc bnc" id="L1398" title="All 2 branches missed.">    if (modulepath != null) {</span>
+<span class="nc" id="L1399">      final List&lt;File&gt; pathelements = modulepath.getPathElements();</span>
+<span class="nc bnc" id="L1400" title="All 4 branches missed.">      if (pathelements != null &amp;&amp; !pathelements.isEmpty()) {</span>
+<span class="nc" id="L1401">        result = pathelements.stream()</span>
+<span class="nc" id="L1402">            .filter(Objects::nonNull)</span>
+<span class="nc" id="L1403">            .map(file -&gt; file.toString())</span>
+<span class="nc" id="L1404">            .collect(Collectors.joining(File.pathSeparator));</span>
+<span class="nc bnc" id="L1405" title="All 2 branches missed.">        if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1406">          getLog().debug(PluginUtils.getPathElementsDebugInfo(&quot;PATHELEMENTS&quot;,</span>
+              pathelements));
+<span class="nc" id="L1408">          getLog().debug(result);</span>
+        }
+      }
+    }
+<span class="nc" id="L1412">    return result;</span>
+  }
+
+  /**
+   * Get filesets from modulepath parameter.
+   *
+   * @return path contains filesets
+   *
+   * @throws MojoExecutionException if any errors occurred while resolving
+   *                                a fileset
+   */
+  private String getFileSets() throws MojoExecutionException {
+<span class="nc" id="L1424">    String result = null;</span>
+<span class="nc bnc" id="L1425" title="All 2 branches missed.">    if (modulepath != null) {</span>
+<span class="nc" id="L1426">      final List&lt;FileSet&gt; filesets = modulepath.getFileSets();</span>
+<span class="nc bnc" id="L1427" title="All 4 branches missed.">      if (filesets != null &amp;&amp; !filesets.isEmpty()) {</span>
+<span class="nc bnc" id="L1428" title="All 2 branches missed.">        for (final FileSet fileSet : filesets) {</span>
+          final File fileSetDir;
+          try {
+<span class="nc" id="L1431">            fileSetDir =</span>
+<span class="nc" id="L1432">                PluginUtils.normalizeFileSetBaseDir(getBaseDir(), fileSet);</span>
+<span class="nc" id="L1433">          } catch (IOException ex) {</span>
+<span class="nc" id="L1434">            throw new MojoExecutionException(</span>
+                &quot;Error: Unable to resolve fileset&quot;, ex);
+<span class="nc" id="L1436">          }</span>
+<span class="nc" id="L1437">          result = Stream.of(getFileSetManager().getIncludedFiles(fileSet))</span>
+<span class="nc bnc" id="L1438" title="All 2 branches missed.">              .filter(fileName -&gt; !StringUtils.isBlank(fileName))</span>
+<span class="nc" id="L1439">              .map(fileName -&gt; fileSetDir.toPath().resolve(</span>
+<span class="nc" id="L1440">                  StringUtils.stripToEmpty(fileName)).toString())</span>
+<span class="nc" id="L1441">              .collect(Collectors.joining(File.pathSeparator));</span>
+<span class="nc bnc" id="L1442" title="All 2 branches missed.">          if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1443">            getLog().debug(PluginUtils.getFileSetDebugInfo(&quot;FILESET&quot;,</span>
+                fileSet, result));
+          }
+<span class="nc" id="L1446">        }</span>
+      }
+    }
+<span class="nc" id="L1449">    return result;</span>
+  }
+
+  /**
+   * Get dirsets from modulepath parameter.
+   *
+   * @return path contains dirsets
+   *
+   * @throws MojoExecutionException if any errors occurred while resolving
+   *                                a dirset
+   */
+  private String getDirSets() throws MojoExecutionException {
+<span class="nc" id="L1461">    String result = null;</span>
+<span class="nc bnc" id="L1462" title="All 2 branches missed.">    if (modulepath != null) {</span>
+<span class="nc" id="L1463">      final List&lt;FileSet&gt; dirsets = modulepath.getDirSets();</span>
+<span class="nc bnc" id="L1464" title="All 4 branches missed.">      if (dirsets != null &amp;&amp; !dirsets.isEmpty()) {</span>
+<span class="nc bnc" id="L1465" title="All 2 branches missed.">        for (final FileSet dirSet : dirsets) {</span>
+          final File dirSetDir;
+          try {
+<span class="nc" id="L1468">            dirSetDir =</span>
+<span class="nc" id="L1469">                PluginUtils.normalizeFileSetBaseDir(getBaseDir(), dirSet);</span>
+<span class="nc" id="L1470">          } catch (IOException ex) {</span>
+<span class="nc" id="L1471">            throw new MojoExecutionException(</span>
+                &quot;Error: Unable to resolve dirset&quot;, ex);
+<span class="nc" id="L1473">          }</span>
+<span class="nc" id="L1474">          result = Stream.of(getFileSetManager().getIncludedDirectories(dirSet))</span>
+<span class="nc bnc" id="L1475" title="All 2 branches missed.">              .filter(dirName -&gt; !StringUtils.isBlank(dirName))</span>
+<span class="nc" id="L1476">              .map(dirName -&gt; dirSetDir.toPath().resolve(</span>
+<span class="nc" id="L1477">                  StringUtils.stripToEmpty(dirName)).toString())</span>
+<span class="nc" id="L1478">              .collect(Collectors.joining(File.pathSeparator));</span>
+<span class="nc bnc" id="L1479" title="All 2 branches missed.">          if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1480">            getLog().debug(PluginUtils.getFileSetDebugInfo(&quot;DIRSET&quot;,</span>
+                dirSet, result));
+          }
+<span class="nc" id="L1483">        }</span>
+      }
+    }
+<span class="nc" id="L1486">    return result;</span>
+  }
+
+  /**
+   * Get dependencysets from modulepath parameter.
+   *
+   * @return path contains dependencysets
+   */
+  private String getDependencySets() {
+<span class="nc" id="L1495">    String result = null;</span>
+<span class="nc bnc" id="L1496" title="All 2 branches missed.">    if (modulepath != null) {</span>
+<span class="nc" id="L1497">      final List&lt;DependencySet&gt; dependencysets =</span>
+<span class="nc" id="L1498">          modulepath.getDependencySets();</span>
+<span class="nc bnc" id="L1499" title="All 4 branches missed.">      if (dependencysets != null &amp;&amp; !dependencysets.isEmpty()) {</span>
+<span class="nc bnc" id="L1500" title="All 2 branches missed.">        for (final DependencySet dependencySet : dependencysets) {</span>
+<span class="nc" id="L1501">          result = getIncludedDependencies(dependencySet)</span>
+<span class="nc" id="L1502">              .stream()</span>
+<span class="nc" id="L1503">              .collect(Collectors.joining(File.pathSeparator));</span>
+<span class="nc bnc" id="L1504" title="All 2 branches missed.">          if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1505">            getLog().debug(PluginUtils.getDependencySetDebugInfo(</span>
+                &quot;DEPENDENCYSET&quot;, dependencySet, result));
+          }
+<span class="nc" id="L1508">        }</span>
+      }
+    }
+<span class="nc" id="L1511">    return result;</span>
+  }
+
+  /**
+   * Get the included project dependencies
+   * defined in the specified dependencyset.
+   *
+   * @param depSet the dependencyset
+   *
+   * @return the set of the included project dependencies
+   */
+  private Set&lt;String&gt; getIncludedDependencies(final DependencySet depSet) {
+<span class="nc" id="L1523">    return projectDependencies.getPathElements().entrySet().stream()</span>
+<span class="nc bnc" id="L1524" title="All 2 branches missed.">        .filter(entry -&gt; entry != null</span>
+<span class="nc bnc" id="L1525" title="All 2 branches missed.">            &amp;&amp; entry.getKey() != null</span>
+<span class="nc bnc" id="L1526" title="All 2 branches missed.">            &amp;&amp; filterDependency(depSet, entry.getKey(), entry.getValue()))</span>
+<span class="nc" id="L1527">        .map(entry -&gt; entry.getKey().toString())</span>
+<span class="nc" id="L1528">        .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Get the excluded project dependencies
+   * defined in the specified dependencyset.
+   *
+   * @param depSet the dependencyset
+   *
+   * @return the set of the excluded project dependencies
+   */
+  private Set&lt;String&gt; getExcludedDependencies(final DependencySet depSet) {
+<span class="nc" id="L1540">    return projectDependencies.getPathElements().entrySet().stream()</span>
+<span class="nc bnc" id="L1541" title="All 2 branches missed.">        .filter(entry -&gt; entry != null</span>
+<span class="nc bnc" id="L1542" title="All 2 branches missed.">            &amp;&amp; entry.getKey() != null</span>
+<span class="nc bnc" id="L1543" title="All 2 branches missed.">            &amp;&amp; !filterDependency(depSet, entry.getKey(), entry.getValue()))</span>
+<span class="nc" id="L1544">        .map(entry -&gt; entry.getKey().toString())</span>
+<span class="nc" id="L1545">        .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Checks whether the dependency defined by the file and
+   * the module descriptor matches the rules defined in the dependencyset.
+   * The dependency that matches at least one include pattern will be included,
+   * but if the dependency matches at least one exclude pattern too,
+   * then the dependency will not be included.
+   *
+   * @param depSet the dependencyset
+   * @param file the dependency file
+   * @param descriptor the dependency module descriptor
+   *
+   * @return will the dependency be accepted
+   */
+  private boolean filterDependency(final DependencySet depSet, final File file,
+      final JavaModuleDescriptor descriptor) {
+
+<span class="nc bnc" id="L1564" title="All 2 branches missed.">    if (descriptor == null) {</span>
+<span class="nc bnc" id="L1565" title="All 2 branches missed.">      if (getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L1566">        getLog().warn(&quot;Missing module descriptor: &quot; + file);</span>
+      }
+    } else {
+<span class="nc bnc" id="L1569" title="All 4 branches missed.">      if (descriptor.isAutomatic() &amp;&amp; getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1570">        getLog().debug(&quot;Found automatic module: &quot; + file);</span>
+      }
+    }
+
+<span class="nc" id="L1574">    boolean isIncluded = false;</span>
+
+<span class="nc bnc" id="L1576" title="All 2 branches missed.">    if (depSet == null) {</span>
+      // include module by default
+<span class="nc" id="L1578">      isIncluded = true;</span>
+      // include automatic module by default
+<span class="nc bnc" id="L1580" title="All 4 branches missed.">      if (descriptor != null &amp;&amp; descriptor.isAutomatic()</span>
+<span class="nc bnc" id="L1581" title="All 2 branches missed.">          &amp;&amp; getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1582">        getLog().debug(&quot;Included automatic module: &quot; + file);</span>
+      }
+      // exclude output module by default
+<span class="nc bnc" id="L1585" title="All 2 branches missed.">      if (file.compareTo(getOutputDir()) == 0) {</span>
+<span class="nc" id="L1586">        isIncluded = false;</span>
+<span class="nc bnc" id="L1587" title="All 2 branches missed.">        if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1588">          getLog().debug(&quot;Excluded output module: &quot; + file);</span>
+        }
+      }
+    } else {
+<span class="nc bnc" id="L1592" title="All 4 branches missed.">      if (descriptor != null &amp;&amp; descriptor.isAutomatic()</span>
+<span class="nc bnc" id="L1593" title="All 2 branches missed.">          &amp;&amp; depSet.isAutomaticExcluded()) {</span>
+<span class="nc bnc" id="L1594" title="All 2 branches missed.">        if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1595">          getLog().debug(&quot;Excluded automatic module: &quot; + file);</span>
+        }
+      } else {
+<span class="nc bnc" id="L1598" title="All 2 branches missed.">        if (file.compareTo(getOutputDir()) == 0) {</span>
+<span class="nc bnc" id="L1599" title="All 2 branches missed.">          if (depSet.isOutputIncluded()) {</span>
+<span class="nc" id="L1600">            isIncluded = true;</span>
+<span class="nc bnc" id="L1601" title="All 2 branches missed.">            if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1602">              getLog().debug(&quot;Included output module: &quot; + file);</span>
+            }
+          } else {
+<span class="nc bnc" id="L1605" title="All 2 branches missed.">            if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1606">              getLog().debug(&quot;Excluded output module: &quot; + file);</span>
+            }
+          }
+        } else {
+<span class="nc bnc" id="L1610" title="All 2 branches missed.">          isIncluded = matchesIncludes(depSet, file, descriptor)</span>
+<span class="nc bnc" id="L1611" title="All 2 branches missed.">              &amp;&amp; !matchesExcludes(depSet, file, descriptor);</span>
+        }
+      }
+    }
+
+<span class="nc bnc" id="L1616" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1617">      getLog().debug(PluginUtils.getDependencyDebugInfo(file, descriptor,</span>
+          isIncluded));
+    }
+
+<span class="nc" id="L1621">    return isIncluded;</span>
+  }
+
+  /**
+   * Checks whether the dependency defined by the file and
+   * the module descriptor matches the include patterns
+   * from the dependencyset.
+   *
+   * @param depSet the dependencyset
+   * @param file the file
+   * @param descriptor the module descriptor
+   *
+   * @return should the dependency be included
+   */
+  private boolean matchesIncludes(final DependencySet depSet, final File file,
+      final JavaModuleDescriptor descriptor) {
+
+<span class="nc bnc" id="L1638" title="All 2 branches missed.">    final String name = descriptor == null ? &quot;&quot; : descriptor.name();</span>
+
+<span class="nc" id="L1640">    final List&lt;String&gt; includes = depSet.getIncludes();</span>
+<span class="nc" id="L1641">    final List&lt;String&gt; includenames = depSet.getIncludeNames();</span>
+
+<span class="nc" id="L1643">    boolean result = true;</span>
+
+<span class="nc bnc" id="L1645" title="All 4 branches missed.">    if (includenames == null || includenames.isEmpty()) {</span>
+<span class="nc bnc" id="L1646" title="All 4 branches missed.">      if (includes == null || includes.isEmpty()) {</span>
+<span class="nc" id="L1647">        result = true;</span>
+      } else {
+<span class="nc" id="L1649">        result = pathMatches(includes, file.toPath());</span>
+      }
+    } else {
+<span class="nc bnc" id="L1652" title="All 4 branches missed.">      if (includes == null || includes.isEmpty()) {</span>
+<span class="nc" id="L1653">        result = nameMatches(includenames, name);</span>
+      } else {
+<span class="nc bnc" id="L1655" title="All 2 branches missed.">        result = pathMatches(includes, file.toPath())</span>
+<span class="nc bnc" id="L1656" title="All 2 branches missed.">            || nameMatches(includenames, name);</span>
+      }
+    }
+<span class="nc" id="L1659">    return result;</span>
+  }
+
+  /**
+   * Checks whether the dependency defined by the file and
+   * the module descriptor matches the exclude patterns
+   * from the dependencyset.
+   *
+   * @param depSet the dependencyset
+   * @param file the file
+   * @param descriptor the module descriptor
+   *
+   * @return should the dependency be excluded
+   */
+  private boolean matchesExcludes(final DependencySet depSet, final File file,
+      final JavaModuleDescriptor descriptor) {
+
+<span class="nc bnc" id="L1676" title="All 2 branches missed.">    final String name = descriptor == null ? &quot;&quot; : descriptor.name();</span>
+
+<span class="nc" id="L1678">    final List&lt;String&gt; excludes = depSet.getExcludes();</span>
+<span class="nc" id="L1679">    final List&lt;String&gt; excludenames = depSet.getExcludeNames();</span>
+
+<span class="nc" id="L1681">    boolean result = false;</span>
+
+<span class="nc bnc" id="L1683" title="All 4 branches missed.">    if (excludenames == null || excludenames.isEmpty()) {</span>
+<span class="nc bnc" id="L1684" title="All 4 branches missed.">      if (excludes == null || excludes.isEmpty()) {</span>
+<span class="nc" id="L1685">        result = false;</span>
+      } else {
+<span class="nc" id="L1687">        result = pathMatches(excludes, file.toPath());</span>
+      }
+    } else {
+<span class="nc bnc" id="L1690" title="All 4 branches missed.">      if (excludes == null || excludes.isEmpty()) {</span>
+<span class="nc" id="L1691">        result = nameMatches(excludenames, name);</span>
+      } else {
+<span class="nc bnc" id="L1693" title="All 2 branches missed.">        result = pathMatches(excludes, file.toPath())</span>
+<span class="nc bnc" id="L1694" title="All 2 branches missed.">            || nameMatches(excludenames, name);</span>
+      }
+    }
+<span class="nc" id="L1697">    return result;</span>
+  }
+
+  /**
+   * Checks if the path matches at least one of the patterns.
+   * The pattern should be regex or glob, this is determined
+   * by the prefix specified in the pattern.
+   *
+   * @param patterns the list of patterns
+   * @param path the file path
+   *
+   * @return true if the path matches at least one of the patterns or
+   *              if no patterns are specified
+   */
+  private boolean pathMatches(final List&lt;String&gt; patterns, final Path path) {
+<span class="nc bnc" id="L1712" title="All 2 branches missed.">    for (final String pattern : patterns) {</span>
+      final PathMatcher pathMatcher =
+<span class="nc" id="L1714">          FileSystems.getDefault().getPathMatcher(pattern);</span>
+<span class="nc bnc" id="L1715" title="All 2 branches missed.">      if (pathMatcher.matches(path)) {</span>
+<span class="nc" id="L1716">        return true;</span>
+      }
+<span class="nc" id="L1718">    }</span>
+<span class="nc" id="L1719">    return false;</span>
+  }
+
+  /**
+   * Checks if the name matches at least one of the patterns.
+   * The pattern should be regex only.
+   *
+   * @param patterns the list of patterns
+   * @param name the name
+   *
+   * @return true if the name matches at least one of the patterns or
+   *              if no patterns are specified
+   */
+  private boolean nameMatches(final List&lt;String&gt; patterns, final String name) {
+<span class="nc bnc" id="L1733" title="All 2 branches missed.">    for (final String pattern : patterns) {</span>
+<span class="nc" id="L1734">      final Pattern regexPattern = Pattern.compile(pattern);</span>
+<span class="nc" id="L1735">      final Matcher nameMatcher = regexPattern.matcher(name);</span>
+<span class="nc bnc" id="L1736" title="All 2 branches missed.">      if (nameMatcher.matches()) {</span>
+<span class="nc" id="L1737">        return true;</span>
+      }
+<span class="nc" id="L1739">    }</span>
+<span class="nc" id="L1740">    return false;</span>
+  }
+
+  /**
+   * Process modules.
+   *
+   * @param cmdLine the command line builder
+   *
+   * @throws MojoExecutionException if any errors occurred
+   */
+  private void processModules(final CommandLineBuilder cmdLine)
+      throws MojoExecutionException {
+<span class="nc" id="L1752">    CommandLineOption opt = null;</span>
+    // modulepath
+<span class="nc bnc" id="L1754" title="All 2 branches missed.">    if (modulepath != null) {</span>
+<span class="nc" id="L1755">      final StringBuilder path = new StringBuilder();</span>
+<span class="nc" id="L1756">      final String pathElements = getPathElements();</span>
+<span class="nc bnc" id="L1757" title="All 2 branches missed.">      if (!StringUtils.isBlank(pathElements)) {</span>
+<span class="nc" id="L1758">        path.append(StringUtils.stripToEmpty(pathElements));</span>
+      }
+<span class="nc" id="L1760">      final String fileSets = getFileSets();</span>
+<span class="nc bnc" id="L1761" title="All 2 branches missed.">      if (!StringUtils.isBlank(fileSets)) {</span>
+<span class="nc bnc" id="L1762" title="All 2 branches missed.">        if (path.length() != 0) {</span>
+<span class="nc" id="L1763">          path.append(File.pathSeparator);</span>
+        }
+<span class="nc" id="L1765">        path.append(StringUtils.stripToEmpty(fileSets));</span>
+      }
+<span class="nc" id="L1767">      final String dirSets = getDirSets();</span>
+<span class="nc bnc" id="L1768" title="All 2 branches missed.">      if (!StringUtils.isBlank(dirSets)) {</span>
+<span class="nc bnc" id="L1769" title="All 2 branches missed.">        if (path.length() != 0) {</span>
+<span class="nc" id="L1770">          path.append(File.pathSeparator);</span>
+        }
+<span class="nc" id="L1772">        path.append(StringUtils.stripToEmpty(dirSets));</span>
+      }
+<span class="nc" id="L1774">      final String dependencySets = getDependencySets();</span>
+<span class="nc bnc" id="L1775" title="All 2 branches missed.">      if (!StringUtils.isBlank(dependencySets)) {</span>
+<span class="nc bnc" id="L1776" title="All 2 branches missed.">        if (path.length() != 0) {</span>
+<span class="nc" id="L1777">          path.append(File.pathSeparator);</span>
+        }
+<span class="nc" id="L1779">        path.append(StringUtils.stripToEmpty(dependencySets));</span>
+      }
+<span class="nc bnc" id="L1781" title="All 2 branches missed.">      if (path.length() != 0) {</span>
+<span class="nc" id="L1782">        opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1783">        opt.createArg().setValue(&quot;--module-path&quot;);</span>
+<span class="nc" id="L1784">        opt.createArg().setValue(path.toString());</span>
+      }
+    }
+    // addmodules
+<span class="nc bnc" id="L1788" title="All 4 branches missed.">    if (addmodules != null &amp;&amp; !addmodules.isEmpty()) {</span>
+<span class="nc" id="L1789">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1790">      opt.createArg().setValue(&quot;--add-modules&quot;);</span>
+<span class="nc" id="L1791">      opt.createArg().setValue(</span>
+<span class="nc" id="L1792">          addmodules.stream().collect(Collectors.joining(&quot;,&quot;)));</span>
+    }
+    // bindservices
+<span class="nc bnc" id="L1795" title="All 2 branches missed.">    if (bindservices) {</span>
+<span class="nc" id="L1796">      opt = cmdLine.createOpt();</span>
+<span class="nc" id="L1797">      opt.createArg().setValue(&quot;--bind-services&quot;);</span>
+    }
+<span class="nc" id="L1799">  }</span>
+
+  /**
+   * Execute goal.
+   *
+   * @throws MojoExecutionException if any errors occurred
+   */
+  @Override
+  public void execute() throws MojoExecutionException {
+
+    // Init
+<span class="nc" id="L1810">    init(TOOL_NAME, toolhome, TOOL_HOME_BIN); // from BaseToolMojo</span>
+
+    // Check version
+<span class="nc" id="L1813">    final JavaVersion toolJavaVersion = getToolJavaVersion();</span>
+<span class="nc bnc" id="L1814" title="All 2 branches missed.">    if (toolJavaVersion == null</span>
+<span class="nc bnc" id="L1815" title="All 2 branches missed.">        || !toolJavaVersion.atLeast(JavaVersion.JAVA_9)) {</span>
+<span class="nc" id="L1816">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: At least {0} is required to use [{1}]&quot;, JavaVersion.JAVA_9,
+          TOOL_NAME));
+    }
+
+    // Delete temporary directory if it exists
+<span class="nc bnc" id="L1822" title="All 2 branches missed.">    if (temp != null) {</span>
+<span class="nc bnc" id="L1823" title="All 2 branches missed.">      if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1824">        getLog().debug(MessageFormat.format(</span>
+            &quot;Temporary directory: [{0}]&quot;, temp));
+      }
+<span class="nc bnc" id="L1827" title="All 4 branches missed.">      if (temp.exists() &amp;&amp; temp.isDirectory()) {</span>
+        try {
+<span class="nc" id="L1829">          FileUtils.deleteDirectory(temp);</span>
+<span class="nc" id="L1830">        } catch (IOException ex) {</span>
+<span class="nc" id="L1831">          throw new MojoExecutionException(MessageFormat.format(</span>
+              &quot;Error: Unable to delete temporary directory: [{0}]&quot;, temp), ex);
+<span class="nc" id="L1833">        }</span>
+      }
+    }
+
+    // Resolve and fetch project dependencies
+<span class="nc" id="L1838">    projectDependencies = resolveDependencies();</span>
+<span class="nc" id="L1839">    mainModuleDescriptor = fetchMainModuleDescriptor();</span>
+    // final List&lt;File&gt; classpathElements = fetchClasspathElements();
+    // final List&lt;File&gt; modulepathElements = fetchModulepathElements();
+<span class="nc" id="L1842">    final Map&lt;File, String&gt; pathExceptions = fetchPathExceptions();</span>
+<span class="nc bnc" id="L1843" title="All 4 branches missed.">    if (!pathExceptions.isEmpty() &amp;&amp; getLog().isWarnEnabled()) {</span>
+<span class="nc" id="L1844">      getLog().warn(&quot;Found path exceptions: &quot; + pathExceptions.size()</span>
+<span class="nc" id="L1845">          + System.lineSeparator()</span>
+<span class="nc" id="L1846">          + pathExceptions.entrySet().stream()</span>
+<span class="nc" id="L1847">              .map(entry -&gt; entry.getKey().toString()</span>
+<span class="nc" id="L1848">                  + System.lineSeparator()</span>
+<span class="nc" id="L1849">                  + entry.getValue())</span>
+<span class="nc" id="L1850">              .collect(Collectors.joining(System.lineSeparator())));</span>
+    }
+
+    // Build command line and populate the list of the command options
+<span class="nc" id="L1854">    final CommandLineBuilder cmdLineBuilder = new CommandLineBuilder();</span>
+<span class="nc" id="L1855">    cmdLineBuilder.setExecutable(getToolExecutable().toString());</span>
+<span class="nc" id="L1856">    processOptions(cmdLineBuilder);</span>
+<span class="nc" id="L1857">    processModules(cmdLineBuilder);</span>
+<span class="nc" id="L1858">    final List&lt;String&gt; optsLines = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L1859">    optsLines.add(&quot;# &quot; + TOOL_NAME);</span>
+<span class="nc" id="L1860">    optsLines.addAll(cmdLineBuilder.buildOptionList());</span>
+<span class="nc bnc" id="L1861" title="All 2 branches missed.">    if (getLog().isDebugEnabled()) {</span>
+<span class="nc" id="L1862">      getLog().debug(optsLines.stream()</span>
+<span class="nc" id="L1863">          .collect(Collectors.joining(System.lineSeparator(),</span>
+<span class="nc" id="L1864">              System.lineSeparator(), &quot;&quot;)));</span>
+    }
+
+    // Save the list of command options to the file
+    // will be used in the tool command line
+<span class="nc" id="L1869">    final Path cmdOptsPath = getBuildDir().toPath().resolve(OPTS_FILE);</span>
+    try {
+<span class="nc" id="L1871">      Files.write(cmdOptsPath, optsLines, getCharset());</span>
+<span class="nc" id="L1872">    } catch (IOException ex) {</span>
+<span class="nc" id="L1873">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: Unable to write command options to file: [{0}]&quot;,
+          cmdOptsPath), ex);
+<span class="nc" id="L1876">    }</span>
+<span class="nc" id="L1877">    tempFiles.add(cmdOptsPath.toFile());</span>
+
+    // Prepare command line with command options
+    // specified in the file created early
+<span class="nc" id="L1881">    final Commandline cmdLine = new Commandline();</span>
+<span class="nc" id="L1882">    cmdLine.setExecutable(getToolExecutable().toString());</span>
+<span class="nc" id="L1883">    cmdLine.createArg().setValue(&quot;@&quot; + cmdOptsPath.toString());</span>
+
+    // Execute command line
+<span class="nc" id="L1886">    int exitCode = 0;</span>
+    try {
+<span class="nc" id="L1888">      exitCode = execCmdLine(cmdLine); // from BaseToolMojo</span>
+<span class="nc" id="L1889">    } catch (CommandLineException ex) {</span>
+<span class="nc" id="L1890">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: Unable to execute [{0}] tool&quot;, TOOL_NAME), ex);
+<span class="nc" id="L1892">    }</span>
+<span class="nc bnc" id="L1893" title="All 2 branches missed.">    if (exitCode != 0) {</span>
+<span class="nc bnc" id="L1894" title="All 2 branches missed.">      if (getLog().isErrorEnabled()) {</span>
+<span class="nc" id="L1895">        getLog().error(System.lineSeparator()</span>
+            + &quot;Command options was: &quot;
+<span class="nc" id="L1897">            + System.lineSeparator()</span>
+<span class="nc" id="L1898">            + optsLines.stream()</span>
+<span class="nc" id="L1899">                .collect(Collectors.joining(System.lineSeparator())));</span>
+      }
+<span class="nc" id="L1901">      throw new MojoExecutionException(MessageFormat.format(</span>
+          &quot;Error: Tool execution failed [{0}] with exit code: {1}&quot;, TOOL_NAME,
+<span class="nc" id="L1903">          exitCode));</span>
+    }
+
+    // Delete temporary files
+<span class="nc bnc" id="L1907" title="All 2 branches missed.">    for (final File tempFile : tempFiles) {</span>
+      try {
+<span class="nc" id="L1909">        FileUtils.forceDelete(tempFile);</span>
+<span class="nc" id="L1910">      } catch (IOException ex) {</span>
+<span class="nc" id="L1911">        throw new MojoExecutionException(MessageFormat.format(</span>
+            &quot;Error: Unable to delete temporary file: [{0}]&quot;, tempFile), ex);
+<span class="nc" id="L1913">      }</span>
+<span class="nc" id="L1914">    }</span>
+
+<span class="nc" id="L1916">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

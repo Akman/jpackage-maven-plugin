@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Launcher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JPackage Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">ru.akman.maven.plugins.jpackage</a> &gt; <span class="el_source">Launcher.java</span></div><h1>Launcher.java</h1><pre class="source lang-java linenums">/*
+  Copyright (C) 2020 Alexander Kapitman
+  
+  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+package ru.akman.maven.plugins.jpackage;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.Properties;
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * Additional launcher.
+ */
+<span class="fc" id="L30">public class Launcher {</span>
+
+  /**
+   * Launcher command (script) name.
+   */
+  private String name;
+
+  /**
+   * Launcher properties file.
+   */
+  private File file;
+
+  /**
+   * Main module name.
+   */
+  private String module;
+
+  /**
+   * Main jar filename.
+   */
+  private String mainjar;
+
+  /**
+   * Main class name.
+   */
+  private String mainclass;
+  
+  /**
+   * Command arguments.
+   */
+  private String arguments;
+
+  /**
+   * Java runtime options.
+   */
+  private String javaoptions;
+
+  /**
+   * Launcher command (script) version.
+   */
+  private String appversion;
+
+  /**
+   * Launcher command (script) icon.
+   */
+  private File icon;
+
+  /**
+   * Enable creating a console launcher (which requires console interactions).
+   */
+  private String winconsole;
+
+  /**
+   * Get command (script) name.
+   *
+   * @return the command (script) name without extension
+   */
+  public String getName() {
+<span class="fc" id="L88">    return this.name;</span>
+  }
+  
+  /**
+   * Set command (script) name.
+   *
+   * @param name the name of command (script)
+   */
+  public void setName(final String name) {
+<span class="fc" id="L97">    this.name = name;</span>
+<span class="fc" id="L98">  }</span>
+  
+  /**
+   * Get main module name.
+   *
+   * @return the main module name
+   */
+  public String getModule() {
+<span class="fc" id="L106">    return this.module;</span>
+  }
+  
+  /**
+   * Set main module name.
+   *
+   * @param module the name of main module
+   */
+  public void setModule(final String module) {
+<span class="fc" id="L115">    this.module = module;</span>
+<span class="fc" id="L116">  }</span>
+
+  /**
+   * Get main jar filename.
+   *
+   * @return the main jar filename
+   */
+  public String getMainJar() {
+<span class="fc" id="L124">    return this.mainjar;</span>
+  }
+  
+  /**
+   * Set main jar filename.
+   *
+   * @param mainjar the main jar filename
+   */
+  public void setMainJar(final String mainjar) {
+<span class="nc" id="L133">    this.mainjar = mainjar;</span>
+<span class="nc" id="L134">  }</span>
+  
+  /**
+   * Get main class name.
+   *
+   * @return the main class name
+   */
+  public String getMainClass() {
+<span class="fc" id="L142">    return this.mainclass;</span>
+  }
+  
+  /**
+   * Set main class name.
+   *
+   * @param mainclass the name of main class
+   */
+  public void setMainClass(final String mainclass) {
+<span class="nc" id="L151">    this.mainclass = mainclass;</span>
+<span class="nc" id="L152">  }</span>
+
+  /**
+   * Get command (script) arguments.
+   *
+   * @return the command (script) arguments
+   */
+  public String getArguments() {
+<span class="fc" id="L160">    return this.arguments;</span>
+  }
+  
+  /**
+   * Set command (script) arguments.
+   *
+   * @param arguments the command (script) arguments
+   */
+  public void setArguments(final String arguments) {
+<span class="fc" id="L169">    this.arguments = arguments;</span>
+<span class="fc" id="L170">  }</span>
+
+  /**
+   * Get Java runtime options.
+   *
+   * @return the Java runtime options
+   */
+  public String getJavaOptions() {
+<span class="fc" id="L178">    return this.javaoptions;</span>
+  }
+  
+  /**
+   * Set Java runtime options.
+   *
+   * @param javaoptions Java runtime options
+   */
+  public void setJavaOptions(final String javaoptions) {
+<span class="nc" id="L187">    this.javaoptions = javaoptions;</span>
+<span class="nc" id="L188">  }</span>
+
+  /**
+   * Get launcher command (script) version.
+   *
+   * @return the launcher command (script) version
+   */
+  public String getAppVersion() {
+<span class="fc" id="L196">    return this.appversion;</span>
+  }
+  
+  /**
+   * Set launcher command (script) version.
+   *
+   * @param appversion Launcher command (script) version.
+   */
+  public void setAppVersion(final String appversion) {
+<span class="nc" id="L205">    this.appversion = appversion;</span>
+<span class="nc" id="L206">  }</span>
+
+  /**
+   * Get launcher command (script) icon.
+   *
+   * @return the launcher command (script) icon
+   */
+  public File getIcon() {
+<span class="fc" id="L214">    return this.icon;</span>
+  }
+  
+  /**
+   * Set launcher command (script) icon.
+   *
+   * @param icon Launcher command (script) icon.
+   */
+  public void setIcon(final File icon) {
+<span class="fc" id="L223">    this.icon = icon;</span>
+<span class="fc" id="L224">  }</span>
+
+  /**
+   * Is enabled creating a console launcher.
+   *
+   * @return true if creating a console launcher is enabled
+   */
+  public boolean isWinConsole() {
+<span class="fc" id="L232">    return String.valueOf(true).equals(this.winconsole);</span>
+  }
+  
+  /**
+   * Enable or disable creating a console launcher.
+   *
+   * @param winconsole is creating a console launcher enabled
+   */
+  public void setWinConsole(final String winconsole) {
+<span class="nc" id="L241">    this.winconsole = winconsole;</span>
+<span class="nc" id="L242">  }</span>
+
+  /**
+   * Get launcher properties file.
+   *
+   * @return the launcher properties file
+   */
+  public File getFile() {
+<span class="fc" id="L250">    return this.file;</span>
+  }
+  
+  /**
+   * Set launcher properties file.
+   *
+   * @param file Launcher properties file.
+   */
+  public void setFile(final File file) {
+<span class="fc" id="L259">    this.file = file;</span>
+<span class="fc" id="L260">  }</span>
+
+  /**
+   * Get the launcher properties.
+   *
+   * @param charset The charset using to read properties file.
+   *
+   * @return the launcher properties
+   *
+   * @throws IOException if IO errors occured
+   */
+  public Properties getProperties(final Charset charset) throws IOException {
+<span class="nc" id="L272">    final Properties props = new Properties();</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">    if (file != null) {</span>
+<span class="nc" id="L274">      try (BufferedReader br =</span>
+<span class="nc" id="L275">          Files.newBufferedReader(file.toPath(), charset)) {</span>
+<span class="nc" id="L276">        props.load(br);</span>
+      }
+    }
+<span class="nc bnc" id="L279" title="All 2 branches missed.">    if (!StringUtils.isBlank(module)) {</span>
+<span class="nc" id="L280">      props.setProperty(&quot;module&quot;, module);</span>
+    }
+<span class="nc bnc" id="L282" title="All 2 branches missed.">    if (!StringUtils.isBlank(mainjar)) {</span>
+<span class="nc" id="L283">      props.setProperty(&quot;main-jar&quot;, mainjar);</span>
+    }
+<span class="nc bnc" id="L285" title="All 2 branches missed.">    if (!StringUtils.isBlank(mainclass)) {</span>
+<span class="nc" id="L286">      props.setProperty(&quot;main-class&quot;, mainclass);</span>
+    }
+<span class="nc bnc" id="L288" title="All 2 branches missed.">    if (!StringUtils.isBlank(arguments)) {</span>
+<span class="nc" id="L289">      props.setProperty(&quot;arguments&quot;, arguments);</span>
+    }
+<span class="nc bnc" id="L291" title="All 2 branches missed.">    if (!StringUtils.isBlank(javaoptions)) {</span>
+<span class="nc" id="L292">      props.setProperty(&quot;java-options&quot;, javaoptions);</span>
+    }
+<span class="nc bnc" id="L294" title="All 2 branches missed.">    if (!StringUtils.isBlank(appversion)) {</span>
+<span class="nc" id="L295">      props.setProperty(&quot;app-version&quot;, appversion);</span>
+    }
+<span class="nc bnc" id="L297" title="All 2 branches missed.">    if (icon != null) {</span>
+<span class="nc" id="L298">      props.setProperty(&quot;icon&quot;, icon.toString());</span>
+    }
+<span class="nc bnc" id="L300" title="All 2 branches missed.">    if (winconsole != null) {</span>
+<span class="nc" id="L301">      props.setProperty(&quot;win-console&quot;, String.valueOf(isWinConsole()));</span>
+    }
+<span class="nc" id="L303">    return props;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
