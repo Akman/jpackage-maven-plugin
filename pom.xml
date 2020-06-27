@@ -33,7 +33,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
 
-    <copyright.notice>Copyright (C) ${project.copyright.years} ${project.developers[0].name}</copyright.notice>
+    <copyright.notice>Copyright (C) ${copyright.years} ${project.developers[0].name}</copyright.notice>
 
     <project.encoding>UTF-8</project.encoding>
     <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
@@ -401,12 +401,6 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>${version.build-helper-maven-plugin}</version>
-          <configuration>
-            <locale>en</locale>
-            <name>currentYear</name>
-            <pattern>yyyy</pattern>
-            <unit>year</unit>
-          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-gpg-plugin</artifactId>
@@ -612,6 +606,26 @@
             <goals>
               <goal>timestamp-property</goal>
             </goals>
+            <configuration>
+              <locale>en</locale>
+              <name>currentYear</name>
+              <pattern>yyyy</pattern>
+              <unit>year</unit>
+            </configuration>
+          </execution>
+          <execution>
+            <id>regex-property</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>regex-property</goal>
+            </goals>
+            <configuration>
+              <name>copyright.years</name>
+              <value>${project.inceptionYear} - ${currentYear}</value>
+              <regex>(\d{4}) - \1</regex>
+              <failIfNoMatch>false</failIfNoMatch>
+              <replacement>${currentYear}</replacement>
+            </configuration>
           </execution>
           <execution>
             <id>parse-version</id>
