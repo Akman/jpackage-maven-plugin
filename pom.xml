@@ -19,7 +19,7 @@
 
   <groupId>com.github.akman</groupId>
   <artifactId>jpackage-maven-plugin</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.1</version>
   <packaging>maven-plugin</packaging>
 
   <name>JPackage Maven Plugin</name>
@@ -764,13 +764,9 @@
                 <delete includeemptydirs="true">
                   <fileset dir="${project.basedir}/docs" includes="**/*" />
                 </delete>
-                <replaceregexp
-                    file="${project.reporting.outputDirectory}/changelog.html"
-                    match="&lt;a class=&quot;externalLink&quot;.*&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;"
-                    replace="" byline="true" />
+                <replaceregexp file="${project.reporting.outputDirectory}/changelog.html" match="&lt;a class=&quot;externalLink&quot;.*&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;" replace="" byline="true" />
                 <copy todir="${project.basedir}/docs">
-                  <fileset dir="${project.reporting.outputDirectory}"
-                      includes="**/*" />
+                  <fileset dir="${project.reporting.outputDirectory}" includes="**/*" />
                 </copy>
               </target>
             </configuration>
@@ -1047,7 +1043,7 @@
     <url>https://github.com/akman/jpackage-maven-plugin/tree/${project.scm.tag}</url>
     <connection>scm:git:git@github.com:akman/jpackage-maven-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:akman/jpackage-maven-plugin.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.1.1</tag>
   </scm>
 
   <distributionManagement>
