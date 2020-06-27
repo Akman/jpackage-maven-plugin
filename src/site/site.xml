@@ -100,14 +100,12 @@
         <ribbonColor>orange</ribbonColor>
       </gitHub>
 
-      <!--
       <topBarIcon>
-        <name />
-        <alt />
-        <src />
-        <href />
+        <name>${project.name}</name>
+        <src>images/bean.png</src>
+        <href>index.html</href>
+        <alt>${project.name}</alt>
       </topBarIcon>
-      -->
 
       <!--
       <googleAnalytics>
@@ -179,7 +177,7 @@
     -->
     <menu ref="reports" />
 
-    <footer>${copyright.notice}. All rights reserved.</footer>
+    <footer>&lt;div class="copyright"&gt;${copyright.notice}. All rights reserved.&lt;/div&gt;</footer>
 
   </body>
 
