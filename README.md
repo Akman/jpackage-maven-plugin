@@ -1,4 +1,4 @@
-# JPackage Maven Plugin v0.1.1-SNAPSHOT
+# JPackage Maven Plugin v0.1.1
 
 [![Build Status][travis_badge]][travis_href]
 [![Maven Central][central_badge]][central_href]
@@ -44,7 +44,7 @@ Add the plugin to your pom:
           <plugin>
             <groupId>com.github.akman</groupId>
             <artifactId>jpackage-maven-plugin</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
+            <version>0.1.1</version>
             <configuration>
               <!-- put your configurations here -->
             </configuration>
@@ -88,7 +88,7 @@ repository in your pom.xml.
 
 Pull request template: [.github/pull_request_template.md][pull_request].
 
-[travis_badge]: https://travis-ci.com/akman/jpackage-maven-plugin.svg?branch=v0.1.1-SNAPSHOT
+[travis_badge]: https://travis-ci.com/akman/jpackage-maven-plugin.svg?branch=v0.1.1
 [travis_href]: https://travis-ci.com/akman/jpackage-maven-plugin
 [central_badge]: https://img.shields.io/maven-central/v/com.github.akman/jpackage-maven-plugin
 [central_href]: https://search.maven.org/artifact/com.github.akman/jpackage-maven-plugin

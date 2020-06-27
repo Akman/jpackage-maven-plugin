@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2020</copyright>
     <item>
-      <title>File: 41,
+      <title>File: 42,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -145,6 +145,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#ru.akman.maven.plugins.TestUtils.java">ru/akman/maven/plugins/TestUtils.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#release.properties">release.properties</a>
                 </td>
                 <td>
                   0
