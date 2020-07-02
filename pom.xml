@@ -443,7 +443,7 @@
             -->
             <preparationGoals>
               clean
-              verify
+              validate
               site:site
               resources:copy-resources@prepare
               antrun:run@prepare
@@ -805,7 +805,7 @@
               <goal>checkin</goal>
             </goals>
             <configuration>
-              <message>[maven-release-plugin] update documentation site and version numbers in files</message>
+              <message>[maven-release-plugin] update documentation site and version number in files</message>
               <includes>README.md, docs/**/*</includes>
             </configuration>
           </execution>
