@@ -109,7 +109,7 @@
           <ul class="breadcrumb">
       <li class=""><a href="../index.html" title="JPackage Maven Plugin">JPackage Maven Plugin</a><span class="divider">»</span></li>
     <li class="active ">Create application installer avoiding any intermediate steps</li>
-      <li id="projectVersion" class="pull-right">Version: 0.1.2-SNAPSHOT</li>
+      <li id="projectVersion" class="pull-right">Version: 0.1.2</li>
           </ul>
         </div>
       </header>
@@ -156,7 +156,7 @@
           &lt;plugin&gt;
             &lt;groupId&gt;com.github.akman&lt;/groupId&gt;
             &lt;artifactId&gt;jpackage-maven-plugin&lt;/artifactId&gt;
-            &lt;version&gt;0.1.2-SNAPSHOT&lt;/version&gt;
+            &lt;version&gt;0.1.2&lt;/version&gt;
             &lt;configuration&gt;
 
               &lt;!--
@@ -168,20 +168,20 @@
                   - JDK home directory specified by system variable JAVA_HOME
                   - system path specified by system variable PATH
               --&gt;
-              &lt;toolhome&gt;${env.JPACKAGE_HOME}&lt;/toolhome&gt;
+              &lt;toolhome&gt;$&#x200d;{env.JPACKAGE_HOME}&lt;/toolhome&gt;
               
               &lt;!--
                 Specifies the location in which generated output files are placed.
-                Default value: F:\Workspace\java\jpackage-maven-plugin\target/jpackage
+                Default value: $&#x200d;{project.build.directory}/jpackage
               --&gt;
-              &lt;dest&gt;F:\Workspace\java\jpackage-maven-plugin\target/jpackage&lt;/dest&gt;
+              &lt;dest&gt;$&#x200d;{project.build.directory}/jpackage&lt;/dest&gt;
               
               &lt;!--
                 Specifies the name of subdirectory relative to
                 the destination directory in which files of generated
                 application image are placed.
               --&gt;
-              &lt;name&gt;hello&lt;/name&gt;
+              &lt;name&gt;appname&lt;/name&gt;
               
               &lt;!--
                 Specifies version of the application and/or package.
@@ -206,17 +206,17 @@
               &lt;!--
                 Specifies the location of the icon of the application package.
               --&gt;
-              &lt;icon&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/resources/hello.ico&lt;/icon&gt;
+              &lt;icon&gt;$&#x200d;{project.basedir}/config/jpackage/resources/appname.ico&lt;/icon&gt;
               
               &lt;!--
                 Specifies the module path. The path where the jlink tool
                 discovers observable modules: modular JAR files, JMOD files,
                 exploded modules. If this option is not specified, then
-                the default module path is $JAVA_HOME/jmods. This directory
+                the default module path is $ JAVA_HOME/jmods. This directory
                 contains the java.base module and the other standard and
                 JDK modules. If this option is specified but the java.base
                 module cannot be resolved from it, then the jlink command
-                appends $JAVA_HOME/jmods to the module path.
+                appends $ JAVA_HOME/jmods to the module path.
                 Pass on &amp;dash;-modulepath option to jlink.
               
                 pathelements - passed to jlink as is
@@ -247,7 +247,7 @@
                 is specified) are used.
               --&gt;
               &lt;addmodules&gt;
-                &lt;addmodule&gt;HelloModule&lt;/addmodule&gt;
+                &lt;addmodule&gt;appModuleName&lt;/addmodule&gt;
               &lt;/addmodules&gt;
               
               &lt;!--
@@ -258,7 +258,7 @@
                 Either module or main-jar option can be specified
                 but not both.
               --&gt;
-              &lt;module&gt;HelloModule/helloClass&lt;/module&gt;
+              &lt;module&gt;appModuleName/appClassName&lt;/module&gt;
               
               &lt;!--
                 Specifies the command line arguments to pass to the main class
@@ -278,12 +278,12 @@
               --&gt;
               &lt;addlaunchers&gt;
                 &lt;addlauncher&gt;
-                  &lt;name&gt;hello-cli&lt;/name&gt;
-                  &lt;module&gt;HelloModule/helloClass&lt;/module&gt;
+                  &lt;name&gt;appname-cli&lt;/name&gt;
+                  &lt;module&gt;AppModuleName/appClassName&lt;/module&gt;
                   &lt;arguments&gt;--help&lt;/arguments&gt;
                   &lt;javaoptions&gt;-Xms256m -Xmx512m&lt;/javaoptions&gt;
                   &lt;appversion&gt;1.0&lt;/appversion&gt;
-                  &lt;icon&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/resources/hello-cli.ico&lt;/icon&gt;
+                  &lt;icon&gt;$&#x200d;{project.basedir}/config/jpackage/resources/appname-cli.ico&lt;/icon&gt;
                   &lt;winconsole&gt;true&lt;/winconsole&gt;
                 &lt;/addlauncher&gt;
               &lt;/addlaunchers&gt;
@@ -293,19 +293,19 @@
                 list of key, value pairs. The keys &quot;extension&quot;, &quot;mime-type&quot;,
                 &quot;icon&quot;, and &quot;description&quot; can be used to describe the association.
               --&gt;
-              &lt;fileassociations&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/associations.properties&lt;/fileassociations&gt;
+              &lt;fileassociations&gt;$&#x200d;{project.basedir}/config/jpackage/associations.properties&lt;/fileassociations&gt;
               
               &lt;!--
                 Specifies the relative sub-path under the default installation
                 location of the application for Windows, or absolute path of the
                 installation directory of the application for Mac or Linux.
               --&gt;
-              &lt;installdir&gt;Vendor/Hello&lt;/installdir&gt;
+              &lt;installdir&gt;Vendor/Appname&lt;/installdir&gt;
               
               &lt;!--
                 Specifies the location of a license file.
               --&gt;
-              &lt;licensefile&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/LICENSE&lt;/licensefile&gt;
+              &lt;licensefile&gt;$&#x200d;{project.basedir}/config/jpackage/LICENSE&lt;/licensefile&gt;
               
               &lt;!--
                 Specifies the location of a resources directory that override
@@ -313,7 +313,7 @@
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               --&gt;
-              &lt;resourcedir&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/resources&lt;/resourcedir&gt;
+              &lt;resourcedir&gt;$&#x200d;{project.basedir}/config/jpackage/resources&lt;/resourcedir&gt;
               
               &lt;!--
                 Enable adding a dialog to choose a directory in which
@@ -331,7 +331,7 @@
               &lt;!--
                 Start menu group this application is placed in.
               --&gt;
-              &lt;winmenugroup&gt;Vendor/Hello&lt;/winmenugroup&gt;
+              &lt;winmenugroup&gt;Vendor/Appname&lt;/winmenugroup&gt;
               
               &lt;!--
                 Enable requesting to perform an install on a per-user basis.

@@ -158,6 +158,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#release.properties">release.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.linux.resources.hello-cli.launcher.properties">src/it/projects/all-in-one/config/jpackage/linux/resources/hello-cli.launcher.properties</a>
                 </td>
                 <td>
@@ -243,20 +257,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#src.it.projects.all-in-one.config.jpackage.linux.resources.hello-cli.properties">src/it/projects/all-in-one/config/jpackage/linux/resources/hello-cli.properties</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/akman/jpackage-maven-plugin/checkstyle.html#target.maven-archiver.pom.properties">target/maven-archiver/pom.properties</a>
                 </td>
                 <td>
                   0

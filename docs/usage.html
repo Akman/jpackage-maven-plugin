@@ -109,7 +109,7 @@
           <ul class="breadcrumb">
       <li class=""><a href="index.html" title="JPackage Maven Plugin">JPackage Maven Plugin</a><span class="divider">»</span></li>
     <li class="active ">Usage</li>
-      <li id="projectVersion" class="pull-right">Version: 0.1.2-SNAPSHOT</li>
+      <li id="projectVersion" class="pull-right">Version: 0.1.2</li>
           </ul>
         </div>
       </header>
@@ -151,44 +151,74 @@
     &lt;build&gt;
       &lt;pluginManagement&gt;
         &lt;plugins&gt;
+          ...
           &lt;plugin&gt;
             &lt;groupId&gt;com.github.akman&lt;/groupId&gt;
             &lt;artifactId&gt;jpackage-maven-plugin&lt;/artifactId&gt;
-            &lt;version&gt;0.1.2-SNAPSHOT&lt;/version&gt;
-            &lt;configuration&gt;
-
-              &lt;!-- put your configurations here --&gt;
-
-            &lt;/configuration&gt;
+            &lt;version&gt;0.1.2&lt;/version&gt;
           &lt;/plugin&gt;
+          ...
         &lt;/plugins&gt;
       &lt;/pluginManagement&gt;
-      ...
-      &lt;plugins&gt;
-        ...
-          &lt;plugin&gt;
-            &lt;groupId&gt;com.github.akman&lt;/groupId&gt;
-            &lt;artifactId&gt;jpackage-maven-plugin&lt;/artifactId&gt;
-            &lt;executions&gt;
-              &lt;execution&gt;
-                &lt;phase&gt;verify&lt;/phase&gt;
-                &lt;goals&gt;
-                  &lt;goal&gt;jpackage&lt;/goal&gt;
-                &lt;/goals&gt;
-              &lt;/execution&gt;
-            &lt;/executions&gt;
-          &lt;/plugin&gt;
-        ...
-      &lt;/plugins&gt;
     &lt;/build&gt;
+    ...
+    &lt;plugins&gt;
+      ...
+      &lt;plugin&gt;
+        &lt;groupId&gt;com.github.akman&lt;/groupId&gt;
+        &lt;artifactId&gt;jpackage-maven-plugin&lt;/artifactId&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;phase&gt;verify&lt;/phase&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;jpackage&lt;/goal&gt;
+            &lt;/goals&gt;
+            &lt;configuration&gt;
+              &lt;!-- put your configurations here --&gt;
+            &lt;/configuration&gt;
+          &lt;execution&gt;
+        &lt;executions&gt;
+      &lt;/plugin&gt;
+      ...
+    &lt;/plugins&gt;
     ...
   &lt;/project&gt;
 </pre></div></div>
 
-<p>You can start the plugin manually after build your project (as usual) up to verify phase.</p>
+<p>And then build your project, <i>jpackage</i> starts automatically.</p>
 
 <div class="source">
-<div class="source"><pre class="prettyprint linenums">mvn verify jpackage:jpackage
+<div class="source"><pre class="prettyprint linenums">mvn clean verify
+</pre></div></div>
+
+<p>Or you can start the plugin manually.</p>
+
+<div class="source">
+<div class="source"><pre class="prettyprint linenums">mvn jpackage:jpackage
+</pre></div></div>
+
+<p>It will not fork (spawn a parallel) an alternate build lifecycle and will execute the <i>jpackage</i> goal immediately.</p>
+<p>If you want to use snapshot versions of the plugin connect the snapshot repository in your pom.xml.</p>
+
+<div class="source">
+<div class="source"><pre class="prettyprint linenums">  &lt;project&gt;
+    ...
+    &lt;pluginRepositories&gt;
+      &lt;pluginRepository&gt;
+        &lt;id&gt;ossrh&lt;/id&gt;
+        &lt;name&gt;OSS Sonatype Snapshots Repository&lt;/name&gt;
+        &lt;url&gt;https://oss.sonatype.org/content/repositories/snapshots&lt;/url&gt;
+        &lt;layout&gt;default&lt;/layout&gt;
+        &lt;snapshots&gt;
+          &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/snapshots&gt;
+        &lt;releases&gt;
+          &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/releases&gt;
+      &lt;/pluginRepository&gt;
+    &lt;/pluginRepositories&gt;
+    ...
+  &lt;/project&gt;
 </pre></div></div>
         </main>
       </div>

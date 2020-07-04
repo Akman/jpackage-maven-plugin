@@ -109,7 +109,7 @@
           <ul class="breadcrumb">
       <li class=""><a href="../index.html" title="JPackage Maven Plugin">JPackage Maven Plugin</a><span class="divider">»</span></li>
     <li class="active ">Create application installer from the predefined application image</li>
-      <li id="projectVersion" class="pull-right">Version: 0.1.2-SNAPSHOT</li>
+      <li id="projectVersion" class="pull-right">Version: 0.1.2</li>
           </ul>
         </div>
       </header>
@@ -156,7 +156,7 @@
           &lt;plugin&gt;
             &lt;groupId&gt;com.github.akman&lt;/groupId&gt;
             &lt;artifactId&gt;jpackage-maven-plugin&lt;/artifactId&gt;
-            &lt;version&gt;0.1.2-SNAPSHOT&lt;/version&gt;
+            &lt;version&gt;0.1.2&lt;/version&gt;
             &lt;configuration&gt;
 
               &lt;!--
@@ -168,18 +168,18 @@
                   - JDK home directory specified by system variable JAVA_HOME
                   - system path specified by system variable PATH
               --&gt;
-              &lt;toolhome&gt;${env.JPACKAGE_HOME}&lt;/toolhome&gt;
+              &lt;toolhome&gt;$&#x200d;{env.JPACKAGE_HOME}&lt;/toolhome&gt;
               
               &lt;!--
                 Specifies the location in which generated output files are placed.
-                Default value: F:\Workspace\java\jpackage-maven-plugin\target/jpackage
+                Default value: $&#x200d;{project.build.directory}/jpackage
               --&gt;
-              &lt;dest&gt;F:\Workspace\java\jpackage-maven-plugin\target/jpackage&lt;/dest&gt;
+              &lt;dest&gt;$&#x200d;{project.build.directory}/jpackage&lt;/dest&gt;
               
               &lt;!--
                 Specifies the installable package name.
               --&gt;
-              &lt;name&gt;hello&lt;/name&gt;
+              &lt;name&gt;appname&lt;/name&gt;
               
               &lt;!--
                 Specifies the type of package to
@@ -212,26 +212,26 @@
                 Specifies the location of the predefined application image
                 that is used to build an installable package.
               --&gt;
-              &lt;appimage&gt;F:\Workspace\java\jpackage-maven-plugin\target/jpackage/hello&lt;/appimage&gt;
+              &lt;appimage&gt;$&#x200d;{project.build.directory}/jpackage/appname&lt;/appimage&gt;
               
               &lt;!--
                 Specifies the location of a properties file that contains
                 list of key, value pairs. The keys &quot;extension&quot;, &quot;mime-type&quot;,
                 &quot;icon&quot;, and &quot;description&quot; can be used to describe the association.
               --&gt;
-              &lt;fileassociations&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/associations.properties&lt;/fileassociations&gt;
+              &lt;fileassociations&gt;$&#x200d;{project.basedir}/config/jpackage/associations.properties&lt;/fileassociations&gt;
               
               &lt;!--
                 Specifies the relative sub-path under the default installation
                 location of the application for Windows, or absolute path of the
                 installation directory of the application for Mac or Linux.
               --&gt;
-              &lt;installdir&gt;Vendor/Hello&lt;/installdir&gt;
+              &lt;installdir&gt;Vendor/Appname&lt;/installdir&gt;
               
               &lt;!--
                 Specifies the location of a license file.
               --&gt;
-              &lt;licensefile&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/LICENSE&lt;/licensefile&gt;
+              &lt;licensefile&gt;$&#x200d;{project.basedir}/config/jpackage/LICENSE&lt;/licensefile&gt;
               
               &lt;!--
                 Specifies the location of a resources directory that override
@@ -239,7 +239,7 @@
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               --&gt;
-              &lt;resourcedir&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/resources&lt;/resourcedir&gt;
+              &lt;resourcedir&gt;$&#x200d;{project.basedir}/config/jpackage/resources&lt;/resourcedir&gt;
               
               &lt;!--
                 Enable adding a dialog to choose a directory in which
@@ -257,7 +257,7 @@
               &lt;!--
                 Start menu group this application is placed in.
               --&gt;
-              &lt;winmenugroup&gt;Vendor/Hello&lt;/winmenugroup&gt;
+              &lt;winmenugroup&gt;Vendor/Appname&lt;/winmenugroup&gt;
               
               &lt;!--
                 Enable requesting to perform an install on a per-user basis.

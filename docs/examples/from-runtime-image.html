@@ -109,7 +109,7 @@
           <ul class="breadcrumb">
       <li class=""><a href="../index.html" title="JPackage Maven Plugin">JPackage Maven Plugin</a><span class="divider">»</span></li>
     <li class="active ">Create application image from a predefined runtime image</li>
-      <li id="projectVersion" class="pull-right">Version: 0.1.2-SNAPSHOT</li>
+      <li id="projectVersion" class="pull-right">Version: 0.1.2</li>
           </ul>
         </div>
       </header>
@@ -156,7 +156,7 @@
           &lt;plugin&gt;
             &lt;groupId&gt;com.github.akman&lt;/groupId&gt;
             &lt;artifactId&gt;jpackage-maven-plugin&lt;/artifactId&gt;
-            &lt;version&gt;0.1.2-SNAPSHOT&lt;/version&gt;
+            &lt;version&gt;0.1.2&lt;/version&gt;
             &lt;configuration&gt;
 
               &lt;!--
@@ -168,19 +168,19 @@
                   - JDK home directory specified by system variable JAVA_HOME
                   - system path specified by system variable PATH
               --&gt;
-              &lt;toolhome&gt;${env.JPACKAGE_HOME}&lt;/toolhome&gt;
+              &lt;toolhome&gt;$&#x200d;{env.JPACKAGE_HOME}&lt;/toolhome&gt;
               
               &lt;!--
                 Specifies the location in which generated output files are placed.
-                Default value: F:\Workspace\java\jpackage-maven-plugin\target/jpackage
+                Default value: $&#x200d;{project.build.directory}/jpackage
               --&gt;
-              &lt;dest&gt;F:\Workspace\java\jpackage-maven-plugin\target/jpackage&lt;/dest&gt;
+              &lt;dest&gt;$&#x200d;{project.build.directory}/jpackage&lt;/dest&gt;
               
               &lt;!--
                 Specifies the name of subdirectory relative to the destination
                 directory in which files of generated application image are placed.
               --&gt;
-              &lt;name&gt;hello&lt;/name&gt;
+              &lt;name&gt;appname&lt;/name&gt;
               
               &lt;!--
                 Specifies the type of package to
@@ -200,7 +200,7 @@
                   - no-man-pages
                   - strip-native-commands
               --&gt;
-              &lt;runtimeimage&gt;F:\Workspace\java\jpackage-maven-plugin\target/jlink/runtime-image&lt;/runtimeimage&gt;
+              &lt;runtimeimage&gt;$&#x200d;{project.build.directory}/jlink/runtime-image&lt;/runtimeimage&gt;
               
               &lt;!--
                 Specifies version of the application and/or package.
@@ -225,7 +225,7 @@
               &lt;!--
                 Specifies the location of the icon of the application package.
               --&gt;
-              &lt;icon&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/resources/hello.ico&lt;/icon&gt;
+              &lt;icon&gt;$&#x200d;{project.basedir}/config/jpackage/resources/appname.ico&lt;/icon&gt;
               
               &lt;!--
                 Specifies the main module (and optionally main class) of
@@ -235,7 +235,7 @@
                 Either module or main-jar option can be specified
                 but not both.
               --&gt;
-              &lt;module&gt;HelloModule/helloClass&lt;/module&gt;
+              &lt;module&gt;appModuleName/appClassName&lt;/module&gt;
               
               &lt;!--
                 Specifies the command line arguments to pass to the main class
@@ -255,12 +255,12 @@
               --&gt;
               &lt;addlaunchers&gt;
                 &lt;addlauncher&gt;
-                  &lt;name&gt;hello-cli&lt;/name&gt;
-                  &lt;module&gt;HelloModule/helloClass&lt;/module&gt;
+                  &lt;name&gt;appname-cli&lt;/name&gt;
+                  &lt;module&gt;appModuleName/appClassName&lt;/module&gt;
                   &lt;arguments&gt;--help&lt;/arguments&gt;
                   &lt;javaoptions&gt;-Xms256m -Xmx512m&lt;/javaoptions&gt;
                   &lt;appversion&gt;1.0&lt;/appversion&gt;
-                  &lt;icon&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/resources/hello-cli.ico&lt;/icon&gt;
+                  &lt;icon&gt;$&#x200d;{project.basedir}/config/jpackage/resources/appname-cli.ico&lt;/icon&gt;
                   &lt;winconsole&gt;true&lt;/winconsole&gt;
                 &lt;/addlauncher&gt;
               &lt;/addlaunchers&gt;
@@ -271,7 +271,7 @@
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               --&gt;
-              &lt;resourcedir&gt;F:\Workspace\java\jpackage-maven-plugin/config/jpackage/resources&lt;/resourcedir&gt;
+              &lt;resourcedir&gt;$&#x200d;{project.basedir}/config/jpackage/resources&lt;/resourcedir&gt;
 
             &lt;/configuration&gt;
           &lt;/plugin&gt;
