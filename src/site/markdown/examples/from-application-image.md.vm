@@ -32,18 +32,18 @@ as the value created on the previous step.
                   - JDK home directory specified by system variable JAVA_HOME
                   - system path specified by system variable PATH
               -->
-              <toolhome>${env.JPACKAGE_HOME}</toolhome>
+              <toolhome>$‍{env.JPACKAGE_HOME}</toolhome>
               
               <!--
                 Specifies the location in which generated output files are placed.
-                Default value: ${project.build.directory}/jpackage
+                Default value: $‍{project.build.directory}/jpackage
               -->
-              <dest>${project.build.directory}/jpackage</dest>
+              <dest>$‍{project.build.directory}/jpackage</dest>
               
               <!--
                 Specifies the installable package name.
               -->
-              <name>hello</name>
+              <name>appname</name>
               
               <!--
                 Specifies the type of package to
@@ -76,26 +76,26 @@ as the value created on the previous step.
                 Specifies the location of the predefined application image
                 that is used to build an installable package.
               -->
-              <appimage>${project.build.directory}/jpackage/hello</appimage>
+              <appimage>$‍{project.build.directory}/jpackage/appname</appimage>
               
               <!--
                 Specifies the location of a properties file that contains
                 list of key, value pairs. The keys "extension", "mime-type",
                 "icon", and "description" can be used to describe the association.
               -->
-              <fileassociations>${project.basedir}/config/jpackage/associations.properties</fileassociations>
+              <fileassociations>$‍{project.basedir}/config/jpackage/associations.properties</fileassociations>
               
               <!--
                 Specifies the relative sub-path under the default installation
                 location of the application for Windows, or absolute path of the
                 installation directory of the application for Mac or Linux.
               -->
-              <installdir>Vendor/Hello</installdir>
+              <installdir>Vendor/Appname</installdir>
               
               <!--
                 Specifies the location of a license file.
               -->
-              <licensefile>${project.basedir}/config/jpackage/LICENSE</licensefile>
+              <licensefile>$‍{project.basedir}/config/jpackage/LICENSE</licensefile>
               
               <!--
                 Specifies the location of a resources directory that override
@@ -103,7 +103,7 @@ as the value created on the previous step.
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               -->
-              <resourcedir>${project.basedir}/config/jpackage/resources</resourcedir>
+              <resourcedir>$‍{project.basedir}/config/jpackage/resources</resourcedir>
               
               <!--
                 Enable adding a dialog to choose a directory in which
@@ -121,7 +121,7 @@ as the value created on the previous step.
               <!--
                 Start menu group this application is placed in.
               -->
-              <winmenugroup>Vendor/Hello</winmenugroup>
+              <winmenugroup>Vendor/Appname</winmenugroup>
               
               <!--
                 Enable requesting to perform an install on a per-user basis.

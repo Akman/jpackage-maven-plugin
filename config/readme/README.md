@@ -5,7 +5,7 @@
 [![License][license_badge]][license_href]
 
 The jpackage maven plugin lets you create a custom runtime image/installer with
-the jpackage tool introduced in Java 14.
+the jpackage tool introduced in Java 13.
 
 The main idea is to avoid being tied to project artifacts and allow the user
 to fully control the process of creating an image/installer.
@@ -16,14 +16,20 @@ to fully control the process of creating an image/installer.
 
 This plugin has two [goals][goals]:
 
-- [jpackage:jpackage][mojo_jpackage] create a custom runtime image.
+- [jpackage:jpackage][mojo_jpackage] is not bound to any phase within the Maven
+lifecycle and is therefore is not automatically executed, therefore
+the required phase must be specified explicitly.
+
 - [jpackage:help][mojo_help] display help information on the plugin.
 
-To create a custom runtime image manually you need only to execute:
+To create a custom runtime image/installer manually you need only to execute:
 
 ```console
 mvn jpackage:jpackage
 ```
+
+It will not fork (spawn a parallel) an alternate build lifecycle and
+will execute the *jpackage* goal immediately.
 
 To display parameter details execute:
 
@@ -41,17 +47,36 @@ Add the plugin to your pom:
     <build>
       <pluginManagement>
         <plugins>
+          ...
           <plugin>
             <groupId>${project.groupId}</groupId>
             <artifactId>${project.artifactId}</artifactId>
             <version>${project.version}</version>
-            <configuration>
-              <!-- put your configurations here -->
-            </configuration>
           </plugin>
+          ...
         </plugins>
       </pluginManagement>
     </build>
+    ...
+    <plugins>
+      ...
+      <plugin>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>${project.artifactId}</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>jpackage</goal>
+            </goals>
+            <configuration>
+              <!-- put your configurations here -->
+            </configuration>
+          <execution>
+        <executions>
+      </plugin>
+      ...
+    </plugins>
     ...
   </project>
 ```
@@ -78,6 +103,12 @@ repository in your pom.xml.
     </pluginRepositories>
     ...
   </project>
+```
+
+And then build your project, *jpackage* starts automatically:
+
+```console
+mvn clean verify
 ```
 
 ## Links

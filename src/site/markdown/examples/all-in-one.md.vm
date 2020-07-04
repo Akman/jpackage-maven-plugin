@@ -33,20 +33,20 @@ Define the **modulepath** and **addmodules** tags.
                   - JDK home directory specified by system variable JAVA_HOME
                   - system path specified by system variable PATH
               -->
-              <toolhome>${env.JPACKAGE_HOME}</toolhome>
+              <toolhome>$‍{env.JPACKAGE_HOME}</toolhome>
               
               <!--
                 Specifies the location in which generated output files are placed.
-                Default value: ${project.build.directory}/jpackage
+                Default value: $‍{project.build.directory}/jpackage
               -->
-              <dest>${project.build.directory}/jpackage</dest>
+              <dest>$‍{project.build.directory}/jpackage</dest>
               
               <!--
                 Specifies the name of subdirectory relative to
                 the destination directory in which files of generated
                 application image are placed.
               -->
-              <name>hello</name>
+              <name>appname</name>
               
               <!--
                 Specifies version of the application and/or package.
@@ -71,17 +71,17 @@ Define the **modulepath** and **addmodules** tags.
               <!--
                 Specifies the location of the icon of the application package.
               -->
-              <icon>${project.basedir}/config/jpackage/resources/hello.ico</icon>
+              <icon>$‍{project.basedir}/config/jpackage/resources/appname.ico</icon>
               
               <!--
                 Specifies the module path. The path where the jlink tool
                 discovers observable modules: modular JAR files, JMOD files,
                 exploded modules. If this option is not specified, then
-                the default module path is $JAVA_HOME/jmods. This directory
+                the default module path is $ JAVA_HOME/jmods. This directory
                 contains the java.base module and the other standard and
                 JDK modules. If this option is specified but the java.base
                 module cannot be resolved from it, then the jlink command
-                appends $JAVA_HOME/jmods to the module path.
+                appends $ JAVA_HOME/jmods to the module path.
                 Pass on &dash;-modulepath option to jlink.
               
                 pathelements - passed to jlink as is
@@ -112,7 +112,7 @@ Define the **modulepath** and **addmodules** tags.
                 is specified) are used.
               -->
               <addmodules>
-                <addmodule>HelloModule</addmodule>
+                <addmodule>appModuleName</addmodule>
               </addmodules>
               
               <!--
@@ -123,7 +123,7 @@ Define the **modulepath** and **addmodules** tags.
                 Either module or main-jar option can be specified
                 but not both.
               -->
-              <module>HelloModule/helloClass</module>
+              <module>appModuleName/appClassName</module>
               
               <!--
                 Specifies the command line arguments to pass to the main class
@@ -143,12 +143,12 @@ Define the **modulepath** and **addmodules** tags.
               -->
               <addlaunchers>
                 <addlauncher>
-                  <name>hello-cli</name>
-                  <module>HelloModule/helloClass</module>
+                  <name>appname-cli</name>
+                  <module>AppModuleName/appClassName</module>
                   <arguments>--help</arguments>
                   <javaoptions>-Xms256m -Xmx512m</javaoptions>
                   <appversion>1.0</appversion>
-                  <icon>${project.basedir}/config/jpackage/resources/hello-cli.ico</icon>
+                  <icon>$‍{project.basedir}/config/jpackage/resources/appname-cli.ico</icon>
                   <winconsole>true</winconsole>
                 </addlauncher>
               </addlaunchers>
@@ -158,19 +158,19 @@ Define the **modulepath** and **addmodules** tags.
                 list of key, value pairs. The keys "extension", "mime-type",
                 "icon", and "description" can be used to describe the association.
               -->
-              <fileassociations>${project.basedir}/config/jpackage/associations.properties</fileassociations>
+              <fileassociations>$‍{project.basedir}/config/jpackage/associations.properties</fileassociations>
               
               <!--
                 Specifies the relative sub-path under the default installation
                 location of the application for Windows, or absolute path of the
                 installation directory of the application for Mac or Linux.
               -->
-              <installdir>Vendor/Hello</installdir>
+              <installdir>Vendor/Appname</installdir>
               
               <!--
                 Specifies the location of a license file.
               -->
-              <licensefile>${project.basedir}/config/jpackage/LICENSE</licensefile>
+              <licensefile>$‍{project.basedir}/config/jpackage/LICENSE</licensefile>
               
               <!--
                 Specifies the location of a resources directory that override
@@ -178,7 +178,7 @@ Define the **modulepath** and **addmodules** tags.
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               -->
-              <resourcedir>${project.basedir}/config/jpackage/resources</resourcedir>
+              <resourcedir>$‍{project.basedir}/config/jpackage/resources</resourcedir>
               
               <!--
                 Enable adding a dialog to choose a directory in which
@@ -196,7 +196,7 @@ Define the **modulepath** and **addmodules** tags.
               <!--
                 Start menu group this application is placed in.
               -->
-              <winmenugroup>Vendor/Hello</winmenugroup>
+              <winmenugroup>Vendor/Appname</winmenugroup>
               
               <!--
                 Enable requesting to perform an install on a per-user basis.

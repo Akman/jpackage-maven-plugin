@@ -32,19 +32,19 @@ as the value created previously by the jlink tool.
                   - JDK home directory specified by system variable JAVA_HOME
                   - system path specified by system variable PATH
               -->
-              <toolhome>${env.JPACKAGE_HOME}</toolhome>
+              <toolhome>$‍{env.JPACKAGE_HOME}</toolhome>
               
               <!--
                 Specifies the location in which generated output files are placed.
-                Default value: ${project.build.directory}/jpackage
+                Default value: $‍{project.build.directory}/jpackage
               -->
-              <dest>${project.build.directory}/jpackage</dest>
+              <dest>$‍{project.build.directory}/jpackage</dest>
               
               <!--
                 Specifies the name of subdirectory relative to the destination
                 directory in which files of generated application image are placed.
               -->
-              <name>hello</name>
+              <name>appname</name>
               
               <!--
                 Specifies the type of package to
@@ -64,7 +64,7 @@ as the value created previously by the jlink tool.
                   - no-man-pages
                   - strip-native-commands
               -->
-              <runtimeimage>${project.build.directory}/jlink/runtime-image</runtimeimage>
+              <runtimeimage>$‍{project.build.directory}/jlink/runtime-image</runtimeimage>
               
               <!--
                 Specifies version of the application and/or package.
@@ -89,7 +89,7 @@ as the value created previously by the jlink tool.
               <!--
                 Specifies the location of the icon of the application package.
               -->
-              <icon>${project.basedir}/config/jpackage/resources/hello.ico</icon>
+              <icon>$‍{project.basedir}/config/jpackage/resources/appname.ico</icon>
               
               <!--
                 Specifies the main module (and optionally main class) of
@@ -99,7 +99,7 @@ as the value created previously by the jlink tool.
                 Either module or main-jar option can be specified
                 but not both.
               -->
-              <module>HelloModule/helloClass</module>
+              <module>appModuleName/appClassName</module>
               
               <!--
                 Specifies the command line arguments to pass to the main class
@@ -119,12 +119,12 @@ as the value created previously by the jlink tool.
               -->
               <addlaunchers>
                 <addlauncher>
-                  <name>hello-cli</name>
-                  <module>HelloModule/helloClass</module>
+                  <name>appname-cli</name>
+                  <module>appModuleName/appClassName</module>
                   <arguments>--help</arguments>
                   <javaoptions>-Xms256m -Xmx512m</javaoptions>
                   <appversion>1.0</appversion>
-                  <icon>${project.basedir}/config/jpackage/resources/hello-cli.ico</icon>
+                  <icon>$‍{project.basedir}/config/jpackage/resources/appname-cli.ico</icon>
                   <winconsole>true</winconsole>
                 </addlauncher>
               </addlaunchers>
@@ -135,7 +135,7 @@ as the value created previously by the jlink tool.
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               -->
-              <resourcedir>${project.basedir}/config/jpackage/resources</resourcedir>
+              <resourcedir>$‍{project.basedir}/config/jpackage/resources</resourcedir>
 
             </configuration>
           </plugin>

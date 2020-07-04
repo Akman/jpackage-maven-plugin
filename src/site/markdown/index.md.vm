@@ -3,7 +3,7 @@
 # Introduction
 
 The ${project.name} lets you create an application image and installer
-with the jpackage tool introduced in Java 14.
+with the jpackage tool introduced in Java 13.
 
 The main idea is to avoid being tied to project artifacts and allow the user
 to fully control the process of creating an image/installer.
@@ -14,7 +14,10 @@ $H$H Goals
 
 This plugin has two [goals][goals]:
 
-- [jpackage:jpackage][jpackagemojo] create a custom runtime image/installer.
+- [jpackage:jpackage][jpackagemojo] is not bound to any phase within the Maven
+lifecycle and is therefore is not automatically executed, therefore
+the required phase must be specified explicitly.
+
 - [jpackage:help][helpmojo] display help information on the plugin.
 
 To create a custom runtime image/installer manually you need only to execute:

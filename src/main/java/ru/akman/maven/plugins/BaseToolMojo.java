@@ -967,8 +967,8 @@ public abstract class BaseToolMojo extends AbstractMojo {
             toolName));
       }
     } else {
-      if (getLog().isInfoEnabled()) {
-        getLog().info(MessageFormat.format(
+      if (getLog().isDebugEnabled()) {
+        getLog().debug(MessageFormat.format(
             "Version (corresponding java version) of [{0}]: {1}", toolName,
             toolJavaVersion));
       }

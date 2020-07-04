@@ -80,7 +80,7 @@ import ru.akman.maven.plugins.CommandLineOption;
 //    requiresOnline = <false|true>,
 //    threadSafe = <false|true>,
 )
-@Execute(
+// @Execute(
 //    This will fork an alternate build lifecycle up to the specified phase
 //    before continuing to execute the current one.
 //    If no lifecycle is specified, Maven will use the lifecycle
@@ -94,7 +94,7 @@ import ru.akman.maven.plugins.CommandLineOption;
 //    This will execute the given alternate lifecycle. A custom lifecycle
 //    can be defined in META-INF/maven/lifecycle.xml.
 //    lifecycle = "<lifecycle>", phase="<phase>"
-)
+// )
 public class JPackageMojo extends BaseToolMojo {
 
   /**
