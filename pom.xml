@@ -81,7 +81,7 @@
     <version.maven>3.6.3</version.maven>
     <version.maven-plugin-annotations>3.6.0</version.maven-plugin-annotations>
     <version.logback-classic>1.2.3</version.logback-classic>
-    <version.junit>4.13</version.junit>
+    <version.junit>4.13.1</version.junit>
     <version.file-management>3.0.0</version.file-management>
     <version.maven-plugin-testing-harness>3.3.0</version.maven-plugin-testing-harness>
     <version.plexus-java>1.0.5</version.plexus-java>
