@@ -1,11 +1,11 @@
-# JPackage Maven Plugin v0.1.2
+# JPackage Maven Plugin v0.1.3-SNAPSHOT
 
 [![Build Status][travis_badge]][travis_href]
 [![Maven Central][central_badge]][central_href]
 [![License][license_badge]][license_href]
 
 The jpackage maven plugin lets you create a custom runtime image/installer with
-the jpackage tool introduced in Java 13.
+the jpackage tool introduced in Java 14.
 
 The main idea is to avoid being tied to project artifacts and allow the user
 to fully control the process of creating an image/installer.
@@ -51,7 +51,7 @@ Add the plugin to your pom:
           <plugin>
             <groupId>com.github.akman</groupId>
             <artifactId>jpackage-maven-plugin</artifactId>
-            <version>0.1.2</version>
+            <version>0.1.3-SNAPSHOT</version>
           </plugin>
           ...
         </plugins>
@@ -119,7 +119,7 @@ mvn clean verify
 
 Pull request template: [.github/pull_request_template.md][pull_request].
 
-[travis_badge]: https://travis-ci.com/akman/jpackage-maven-plugin.svg?branch=v0.1.2
+[travis_badge]: https://travis-ci.com/akman/jpackage-maven-plugin.svg?branch=v0.1.3-SNAPSHOT
 [travis_href]: https://travis-ci.com/akman/jpackage-maven-plugin
 [central_badge]: https://img.shields.io/maven-central/v/com.github.akman/jpackage-maven-plugin
 [central_href]: https://search.maven.org/artifact/com.github.akman/jpackage-maven-plugin
@@ -128,5 +128,5 @@ Pull request template: [.github/pull_request_template.md][pull_request].
 [goals]: https://akman.github.io/jpackage-maven-plugin/plugin-info.html
 [mojo_jpackage]: https://akman.github.io/jpackage-maven-plugin/jpackage-mojo.html
 [mojo_help]: https://akman.github.io/jpackage-maven-plugin/help-mojo.html
-[jpackage]: https://docs.oracle.com/en/java/javase/14/docs/specs/man/jpackage.html
+[jpackage]: https://docs.oracle.com/en/java/javase/14/jpackage
 [pull_request]: https://github.com/akman/jpackage-maven-plugin/blob/master/.github/pull_request_template.md

@@ -3,7 +3,9 @@
 # Introduction
 
 The ${project.name} lets you create an application image and installer
-with the jpackage tool introduced in Java 13.
+with the jpackage tool introduced in Java 14.
+
+[The JPackage User's Guide.][jpackage]
 
 The main idea is to avoid being tied to project artifacts and allow the user
 to fully control the process of creating an image/installer.
@@ -72,3 +74,4 @@ you can take a look into the following examples:
 [src]: ${project.scm.url}
 [issue]: ${project.issueManagement.url}
 [guide]: http://maven.apache.org/guides/development/guide-helping.html
+[jpackage]: https://docs.oracle.com/en/java/javase/14/jpackage

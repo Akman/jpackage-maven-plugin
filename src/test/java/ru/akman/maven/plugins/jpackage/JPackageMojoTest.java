@@ -988,13 +988,16 @@ public class JPackageMojoTest {
    * @throws Exception if any errors occurred
    */
   @Test
+  @SuppressWarnings("unchecked") // unchecked cast
   public void testMojoHasFileAssociations() throws Exception {
-    final File fileassociations =
-        (File) rule.getVariableValueFromObject(mojo, "fileassociations");
+    final List<File> fileassociations =
+        (List<File>) rule.getVariableValueFromObject(mojo, "fileassociations");
     assertEquals("fileassociations",
-        TestUtils.getCanonicalPath(fileassociations),
-        TestUtils.getCanonicalPath(new File(project.getBasedir(),
-            "config/jpackage/associations.properties"))
+        TestUtils.buildPathFromFiles(fileassociations),
+        TestUtils.buildPathFromNames(PROJECT_DIR, Arrays.asList(
+            "config/jpackage/associations1.properties",
+            "config/jpackage/associations2.properties"
+        ))
     );
   }
 

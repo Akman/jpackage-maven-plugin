@@ -281,7 +281,7 @@ public class JPackageMojo extends BaseToolMojo {
   /**
    * Specifies the location of the input directory that contains
    * the files to be packaged. All files in the input directory
-   * will be packaged into the application image.
+   * will be packaged into the application image into $APPDIR directory.
    *
    * <em>BUG: A path cannot contain spaces and unicode characters.</em>
    *
@@ -534,12 +534,19 @@ public class JPackageMojo extends BaseToolMojo {
    * value pairs. The keys "extension", "mime-type", "icon", and "description"
    * can be used to describe the association.
    *
+   * <p><pre>
+   * &lt;fileassociations&gt;
+   *   &lt;fileassociation&gt;assoc1.properties&lt;/fileassociation&gt;
+   *   &lt;fileassociation&gt;assoc2.properties&lt;/fileassociation&gt;
+   * &lt;/fileassociations&gt;
+   * </pre></p>
+   *
    * <em>BUG: A path cannot contain spaces and unicode characters.</em>
    *
    * <p>The jpackage CLI is: <code>--file-associations path</code></p>
    */
   @Parameter
-  private File fileassociations;
+  private List<File> fileassociations;
 
   /**
    * Specifies the relative sub-path under the default installation
@@ -927,6 +934,12 @@ public class JPackageMojo extends BaseToolMojo {
           mainclass));
     }
     // arguments
+    // TODO: argument quotes
+    /*
+    --arguments "\"String 1\" \"String 2\""
+    --arguments "\"String 1\"" --arguments "\"String 2\""
+    --arguments "'String 1'" --arguments "'String 2'"
+    */
     if (!StringUtils.isBlank(arguments)) {
       opt = cmdLine.createOpt();
       opt.createArg().setValue("--arguments");
@@ -934,6 +947,13 @@ public class JPackageMojo extends BaseToolMojo {
           arguments, WRAP_CHAR));
     }
     // javaoptions
+    // TODO: javaoptions quotes
+    /*
+    --java-options "\"-DAppOption=text string\""
+    --java-options "'-DAppOption=text string'"
+    --java-options "-XX:OnError=\"\\\"userdump.exe %p\\\"\""
+    --java-options "-splash:\$APPDIR/myAppSplash.jpg"
+    */
     if (!StringUtils.isBlank(javaoptions)) {
       opt = cmdLine.createOpt();
       opt.createArg().setValue("--java-options");
@@ -980,15 +1000,20 @@ public class JPackageMojo extends BaseToolMojo {
     }
     // fileassociations
     if (fileassociations != null) {
-      opt = cmdLine.createOpt();
-      opt.createArg().setValue("--file-associations");
-      try {
-        opt.createArg().setValue(fileassociations.getCanonicalPath());
-      } catch (IOException ex) {
-        throw new MojoExecutionException(MessageFormat.format(
-            ERROR_RESOLVE,
-            "--file-associations",
-            fileassociations.toString()), ex);
+      for (final File fileassociation : fileassociations) {
+        if (fileassociation != null
+            && !StringUtils.isBlank(fileassociation.toString())) {
+          opt = cmdLine.createOpt();
+          opt.createArg().setValue("--file-associations");
+          try {
+            opt.createArg().setValue(fileassociation.getCanonicalPath());
+          } catch (IOException ex) {
+            throw new MojoExecutionException(MessageFormat.format(
+                ERROR_RESOLVE,
+                "--file-associations",
+                fileassociation.toString()), ex);
+          }
+        }
       }
     }
     // installdir

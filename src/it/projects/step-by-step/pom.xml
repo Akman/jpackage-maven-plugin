@@ -765,7 +765,9 @@
                 list of key, value pairs. The keys "extension", "mime-type",
                 "icon", and "description" can be used to describe the association.
               -->
-              <!--fileassociations>config/jpackage/associations.properties</fileassociations-->
+              <!--fileassociations>
+                <fileassociation>config/jpackage/associations.properties</fileassociation>
+              </fileassociations-->
               <!--
                 Specifies the relative sub-path under the default
                 installation location.
@@ -1138,7 +1140,9 @@
                 list of key, value pairs. The keys "extension", "mime-type",
                 "icon", and "description" can be used to describe the association.
               -->
-              <fileassociations>${jpackage.platform.dir}/associations.properties</fileassociations>
+              <fileassociations>
+                <fileassociation>${jpackage.platform.dir}/associations.properties</fileassociation>
+              </fileassociations>
               <!--
                 Specifies the relative sub-path under the default installation
                 location of the application for Windows, or absolute path of the
