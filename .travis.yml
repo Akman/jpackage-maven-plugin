@@ -51,10 +51,10 @@ matrix:
   include:
 
     - os: linux
-      dist: bionic
+      dist: focal
       language: java
       jdk:
-        - openjdk13
+        - openjdk16
 
 install:
   - /bin/true
