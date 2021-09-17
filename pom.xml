@@ -30,10 +30,10 @@
   <properties>
 
     <!-- Maven -->
-    <version.maven>3.6.3</version.maven>
+    <version.maven>3.8.2</version.maven>
 
     <!-- Java -->
-    <javaVersion>16</javaVersion>
+    <javaVersion>15</javaVersion>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
     <maven.compiler.target>${javaVersion}</maven.compiler.target>
     <maven.compiler.release>${javaVersion}</maven.compiler.release>
