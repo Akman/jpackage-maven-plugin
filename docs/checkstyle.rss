@@ -23,11 +23,11 @@ under the License.
     <link>https://github.com/akman/jpackage-maven-plugin</link>
     <description>JPackage Maven Plugin - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2020</copyright>
+    <copyright>&#169;2020 - 2021</copyright>
     <item>
       <title>File: 41,
              Errors: 0,
-             Warnings: 0,
+             Warnings: 2,
              Infos: 0
       </title>
             <link>https://github.com/akman/jpackage-maven-plugin/checkstyle.html</link>
@@ -500,7 +500,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  1
                 </td>
                 <td>
                   0
@@ -584,7 +584,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  1
                 </td>
                 <td>
                   0

@@ -109,7 +109,7 @@
           <ul class="breadcrumb">
       <li class=""><a href="index.html" title="JPackage Maven Plugin">JPackage Maven Plugin</a><span class="divider">»</span></li>
     <li class="active ">jpackage:jpackage</li>
-      <li id="projectVersion" class="pull-right">Version: 0.1.2</li>
+      <li id="projectVersion" class="pull-right">Version: 0.1.3</li>
           </ul>
         </div>
       </header>
@@ -149,7 +149,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>com.github.akman:jpackage-maven-plugin:0.1.2:jpackage</p>
+<p>com.github.akman:jpackage-maven-plugin:0.1.3:jpackage</p>
       
 <p><b>Description</b>:</p>
       
@@ -352,14 +352,26 @@ no command line arguments are given to the launcher.
             
 <td><code><a href="#fileassociations">&lt;fileassociations&gt;</a></code></td>
             
-<td><code>File</code></td>
+<td><code>List</code></td>
             
 <td><code>-</code></td>
             
 <td>Specifies the location of a properties file that contains list of
 key, value pairs. The keys &quot;extension&quot;, &quot;mime-type&quot;, &quot;icon&quot;, and
-&quot;description&quot; can be used to describe the association. <i>BUG: A
-path cannot contain spaces and unicode characters.</i> 
+&quot;description&quot; can be used to describe the association. 
+
+<div>
+<pre>
+&lt;fileassociations&gt;
+  &lt;fileassociation&gt;assoc1.properties&lt;/fileassociation&gt;
+  &lt;fileassociation&gt;assoc2.properties&lt;/fileassociation&gt;
+&lt;/fileassociations&gt;
+</pre></div>
+
+<br />
+<br />
+ <i>BUG: A path cannot contain spaces and unicode characters.</i>
+
 
 <p>The jpackage CLI is: <code>--file-associations path</code></p><br /></td>
           </tr>
@@ -388,8 +400,8 @@ path cannot contain spaces and unicode characters.</i>
             
 <td>Specifies the location of the input directory that contains the
 files to be packaged. All files in the input directory will be
-packaged into the application image. <i>BUG: A path cannot contain
-spaces and unicode characters.</i> 
+packaged into the application image into $APPDIR directory.
+<i>BUG: A path cannot contain spaces and unicode characters.</i> 
 
 <p>The jpackage CLI is: <code>--input path</code></p><br /></td>
           </tr>
@@ -1149,14 +1161,26 @@ no command line arguments are given to the launcher.
         
 <div>Specifies the location of a properties file that contains list of
 key, value pairs. The keys &quot;extension&quot;, &quot;mime-type&quot;, &quot;icon&quot;, and
-&quot;description&quot; can be used to describe the association. <i>BUG: A
-path cannot contain spaces and unicode characters.</i> 
+&quot;description&quot; can be used to describe the association. 
+
+<div>
+<pre>
+&lt;fileassociations&gt;
+  &lt;fileassociation&gt;assoc1.properties&lt;/fileassociation&gt;
+  &lt;fileassociation&gt;assoc2.properties&lt;/fileassociation&gt;
+&lt;/fileassociations&gt;
+</pre></div>
+
+<br />
+<br />
+ <i>BUG: A path cannot contain spaces and unicode characters.</i>
+
 
 <p>The jpackage CLI is: <code>--file-associations path</code></p></div>
         
 <ul>
           
-<li><b>Type</b>: <code>java.io.File</code></li>
+<li><b>Type</b>: <code>java.util.List</code></li>
           
 <li><b>Required</b>: <code>No</code></li>
         </ul><hr /></section><section>
@@ -1177,8 +1201,8 @@ path cannot contain spaces and unicode characters.</i>
         
 <div>Specifies the location of the input directory that contains the
 files to be packaged. All files in the input directory will be
-packaged into the application image. <i>BUG: A path cannot contain
-spaces and unicode characters.</i> 
+packaged into the application image into $APPDIR directory.
+<i>BUG: A path cannot contain spaces and unicode characters.</i> 
 
 <p>The jpackage CLI is: <code>--input path</code></p></div>
         
@@ -1765,7 +1789,7 @@ is installed.
     <footer>
       <div class="container-fluid">
         <div class="row-fluid">
-<div class="copyright">Copyright (C) 2020 Alexander Kapitman. All rights reserved.</div>
+<div class="copyright">Copyright (C) 2020 - 2021 Alexander Kapitman. All rights reserved.</div>
         </div>
       </div>
     </footer>
