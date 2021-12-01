@@ -829,6 +829,18 @@ public class JPackageMojo extends BaseToolMojo {
         case MSI:
           opt.createArg().setValue("msi");
           break;
+        case RPM:
+          opt.createArg().setValue("rpm");
+          break;
+        case DEB:
+          opt.createArg().setValue("deb");
+          break;
+        case PKG:
+          opt.createArg().setValue("pkg");
+          break;
+        case DMG:
+          opt.createArg().setValue("dmg");
+          break;
         default:
           // skip
       }

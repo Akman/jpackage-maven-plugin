@@ -23,5 +23,9 @@ public enum PackageType {
   PLATFORM,
   IMAGE,
   EXE,
-  MSI
+  MSI,
+  RPM,
+  DEB,
+  PKG,
+  DMG
 }
