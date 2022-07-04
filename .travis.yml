@@ -56,11 +56,15 @@ matrix:
       jdk:
         - openjdk14
 
+before_install:
+  - mvn -N io.takari:maven:wrapper -Dmaven=3.8.6
+  - chmod a+x ./mvnw
+
 install:
   - /bin/true
 
 script:
-  - mvn -q -B clean install
+  - ./mvnw -q -B clean install
 
 cache:
   directories:

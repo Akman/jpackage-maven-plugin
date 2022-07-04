@@ -125,20 +125,9 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <artifactId>maven-toolchains-plugin</artifactId>
-          <version>3.1.0</version>
-          <configuration>
-            <toolchains>
-              <jdk>
-                <version>[${javaVersion},)</version>
-              </jdk>
-            </toolchains>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>com.github.akman</groupId>
           <artifactId>jlink-maven-plugin</artifactId>
-          <version>0.1.9</version>
+          <version>0.1.11</version>
         </plugin>
         <plugin>
           <groupId>@project.groupId@</groupId>
