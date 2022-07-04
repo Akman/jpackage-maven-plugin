@@ -72,8 +72,8 @@ Add the plugin to your pom:
             <configuration>
               <!-- put your configurations here -->
             </configuration>
-          <execution>
-        <executions>
+          </execution>
+        </executions>
       </plugin>
       ...
     </plugins>
