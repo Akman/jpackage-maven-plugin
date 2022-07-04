@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="CHECK" timestamp="1656965003355">
+    <module artifactId="jpackage-maven-plugin" groupId="com.github.akman" version="0.1.4"/>
+    <files>
+        <file path="pom.xml" result="PRESENT"/>
+        <file path="src\it\projects\all-in-one\pom.xml" result="PRESENT"/>
+        <file path="src\it\projects\all-in-one\postbuild.groovy" result="PRESENT"/>
+        <file path="src\it\projects\all-in-one\src\main\java\ru\akman\hello\Main.java" result="PRESENT"/>
+        <file path="src\it\projects\all-in-one\src\main\java\ru\akman\hello\Util.java" result="PRESENT"/>
+        <file path="src\it\projects\all-in-one\src\main\java\ru\akman\module-info.java" result="PRESENT"/>
+        <file path="src\it\projects\all-in-one\src\main\resources\logback.xml" result="PRESENT"/>
+        <file path="src\it\projects\step-by-step\pom.xml" result="PRESENT"/>
+        <file path="src\it\projects\step-by-step\postbuild.groovy" result="PRESENT"/>
+        <file path="src\it\projects\step-by-step\src\main\java\ru\akman\hello\Main.java" result="PRESENT"/>
+        <file path="src\it\projects\step-by-step\src\main\java\ru\akman\hello\Util.java" result="PRESENT"/>
+        <file path="src\it\projects\step-by-step\src\main\java\ru\akman\module-info.java" result="PRESENT"/>
+        <file path="src\it\projects\step-by-step\src\main\resources\logback.xml" result="PRESENT"/>
+        <file path="src\it\settings.xml" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\BaseToolMojo.java" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\CommandLineBuilder.java" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\CommandLineOption.java" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\jpackage\DependencySet.java" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\jpackage\JPackageMojo.java" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\jpackage\Launcher.java" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\jpackage\ModulePath.java" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\jpackage\PackageType.java" result="PRESENT"/>
+        <file path="src\main\java\ru\akman\maven\plugins\jpackage\PluginUtils.java" result="PRESENT"/>
+        <file path="src\site\resources\css\site.css" result="PRESENT"/>
+        <file path="src\site\site.xml" result="PRESENT"/>
+        <file path="src\test\java\ru\akman\maven\plugins\TestUtils.java" result="PRESENT"/>
+        <file path="src\test\java\ru\akman\maven\plugins\jpackage\JPackageMojoTest.java" result="PRESENT"/>
+        <file path="src\test\resources\project\pom.xml" result="PRESENT"/>
+    </files>
+</licensePluginReport>
