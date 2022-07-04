@@ -19,7 +19,7 @@
 
   <groupId>com.github.akman</groupId>
   <artifactId>jpackage-maven-plugin</artifactId>
-  <version>0.1.4-SNAPSHOT</version>
+  <version>0.1.4</version>
   <packaging>maven-plugin</packaging>
 
   <name>JPackage Maven Plugin</name>
@@ -1073,7 +1073,7 @@
     <url>https://github.com/akman/jpackage-maven-plugin/tree/${project.scm.tag}</url>
     <connection>scm:git:git@github.com:akman/jpackage-maven-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:akman/jpackage-maven-plugin.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.1.4</tag>
   </scm>
 
   <distributionManagement>
