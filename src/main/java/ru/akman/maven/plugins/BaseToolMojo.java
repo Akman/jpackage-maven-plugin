@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2020 - 2021 Alexander Kapitman
+  Copyright (C) 2020 - 2022 Alexander Kapitman
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -882,7 +882,7 @@ public abstract class BaseToolMojo extends AbstractMojo {
           "Error: Unable to read project properties");
     }
 
-    fileSetManager = new FileSetManager(getLog(), true);
+    fileSetManager = new FileSetManager();
     if (fileSetManager == null) {
       throw new MojoExecutionException(
           "Error: Unable to create file set manager");
