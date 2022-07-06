@@ -119,8 +119,8 @@ mvn clean verify
 
 Pull request template: [.github/pull_request_template.md][pull_request].
 
-[travis_badge]: https://travis-ci.com/akman/jpackage-maven-plugin.svg?branch=v${project.version}
-[travis_href]: https://travis-ci.com/akman/jpackage-maven-plugin
+[travis_badge]: https://app.travis-ci.com/akman/jpackage-maven-plugin.svg?branch=v${project.version}
+[travis_href]: https://app.travis-ci.com/akman/jpackage-maven-plugin
 [central_badge]: https://img.shields.io/maven-central/v/com.github.akman/jpackage-maven-plugin
 [central_href]: https://search.maven.org/artifact/com.github.akman/jpackage-maven-plugin
 [license_badge]: https://img.shields.io/github/license/akman/jpackage-maven-plugin.svg
