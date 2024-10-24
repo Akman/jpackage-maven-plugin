@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2020 - 2022 Alexander Kapitman
+  Copyright (C) 2020 - 2024 Alexander Kapitman
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -32,14 +33,15 @@
   </description>
 
   <properties>
-    <javaVersion>14</javaVersion>
+    <javaVersion>21</javaVersion>
+    <javafxVersion>21.0.5</javafxVersion>
 
     <default.encoding>UTF-8</default.encoding>
     <java.release.version>${javaVersion}</java.release.version>
-    <javafx.version>${javaVersion}</javafx.version>
-    <slf4j.version>2.0.0-alpha7</slf4j.version>
-    <logback.version>1.3.0-alpha16</logback.version>
-    <picocli.version>4.6.3</picocli.version>
+    <javafx.version>${javafxVersion}</javafx.version>
+    <slf4j.version>2.0.15</slf4j.version>
+    <logback.version>1.5.11</logback.version>
+    <picocli.version>4.7.6</picocli.version>
     <application.name>hello</application.name>
     <application.image.name>hello</application.image.name>
     <application.image.version>1.0</application.image.version>
@@ -48,7 +50,7 @@
     <application.jvm.args>-Dfile.encoding=${default.encoding} -Xms256m -Xmx512m</application.jvm.args>
     <application.args>--gui</application.args>
     <application.description>${project.description}</application.description>
-    <application.copyright>Copyright (C) 2020 Alexander Kapitman</application.copyright>
+    <application.copyright>Copyright (C) 2020-2024 Alexander Kapitman</application.copyright>
     <application.vendor>Akman</application.vendor>
     <project.build.sourceEncoding>${default.encoding}</project.build.sourceEncoding>
     <build.dir>${project.build.directory}</build.dir>
@@ -123,31 +125,31 @@
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.4.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.10.1</version>
+          <version>3.13.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
-          <version>3.0.0-M1</version>
+          <version>3.1.3</version>
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.2</version>
+          <version>3.4.2</version>
         </plugin>
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.8.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.0.0-M2</version>
+          <version>3.1.3</version>
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.3.1</version>
         </plugin>
       </plugins>
     </pluginManagement>

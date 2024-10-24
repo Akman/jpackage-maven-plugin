@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2020 - 2022 Alexander Kapitman
+  Copyright (C) 2020 - 2024 Alexander Kapitman
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -30,11 +30,13 @@
   <properties>
 
     <!-- Maven -->
-    <version.maven>3.8.6</version.maven>
+    <version.maven>3.9.9</version.maven>
 
     <!-- Java -->
-    <javaVersion>9</javaVersion>
-    <maven.compiler.release>${javaVersion}</maven.compiler.release>
+    <javaVersion>23.0.1</javaVersion>
+    <javaSourceVersion>${javaVersion}</javaSourceVersion>
+    <javaTargetVersion>21</javaTargetVersion>
+    <javaReleaseVersion>11</javaReleaseVersion>
 
     <!-- Encoding -->
     <project.encoding>UTF-8</project.encoding>
@@ -45,57 +47,56 @@
     <copyright.notice>Copyright (C) ${copyright.years} ${project.developers[0].name}</copyright.notice>
 
     <!-- Tools -->
-    <version.checkstyle>10.3.1</version.checkstyle>
-    <version.pmd>6.47.0</version.pmd>
-    <version.spotbugs>4.7.1</version.spotbugs>
-    <version.jacoco>0.8.8</version.jacoco>
+    <version.checkstyle>10.18.2</version.checkstyle>
+    <version.pmd>7.6.0</version.pmd>
+    <version.spotbugs>4.8.6</version.spotbugs>
 
     <!-- Dependencies -->
-    <version.maven-plugin-annotations>3.6.4</version.maven-plugin-annotations>
-    <version.slf4j-api>2.0.0-alpha7</version.slf4j-api>
-    <version.logback-classic>1.3.0-alpha16</version.logback-classic>
+    <version.maven-plugin-annotations>3.15.0</version.maven-plugin-annotations>
+    <version.slf4j-api>2.0.16</version.slf4j-api>
+    <version.logback-classic>1.5.11</version.logback-classic>
     <version.junit>4.13.2</version.junit>
     <version.file-management>3.1.0</version.file-management>
     <version.maven-plugin-testing-harness>3.3.0</version.maven-plugin-testing-harness>
-    <version.plexus-java>1.2.0</version.plexus-java>
-    <version.commons-lang3>3.12.0</version.commons-lang3>
-    <version.commons-text>1.9</version.commons-text>
+    <version.plexus-java>1.3.0</version.plexus-java>
+    <version.commons-lang3>3.17.0</version.commons-lang3>
+    <version.commons-text>1.12.0</version.commons-text>
 
     <!-- Plugins -->
-    <version.properties-maven-plugin>1.1.0</version.properties-maven-plugin>
-    <version.build-helper-maven-plugin>3.3.0</version.build-helper-maven-plugin>
-    <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
+    <version.properties-maven-plugin>1.2.1</version.properties-maven-plugin>
+    <version.build-helper-maven-plugin>3.6.0</version.build-helper-maven-plugin>
+    <version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
     <version.maven-antrun-plugin>3.1.0</version.maven-antrun-plugin>
-    <version.maven-assembly-plugin>3.4.0</version.maven-assembly-plugin>
+    <version.maven-assembly-plugin>3.7.1</version.maven-assembly-plugin>
     <version.maven-changelog-plugin>2.3</version.maven-changelog-plugin>
-    <version.maven-dependency-plugin>3.3.0</version.maven-dependency-plugin>
-    <version.maven-release-plugin>3.0.0-M6</version.maven-release-plugin>
-    <version.maven-scm-plugin>2.0.0-M1</version.maven-scm-plugin>
-    <version.maven-jar-plugin>3.2.2</version.maven-jar-plugin>
-    <version.maven-checkstyle-plugin>3.1.2</version.maven-checkstyle-plugin>
-    <version.maven-clean-plugin>3.2.0</version.maven-clean-plugin>
-    <version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
-    <version.maven-deploy-plugin>3.0.0-M2</version.maven-deploy-plugin>
-    <version.nexus-staging-maven-plugin>1.6.13</version.nexus-staging-maven-plugin>
-    <version.maven-enforcer-plugin>3.1.0</version.maven-enforcer-plugin>
-    <version.maven-failsafe-plugin>3.0.0-M7</version.maven-failsafe-plugin>
-    <version.maven-install-plugin>3.0.0-M1</version.maven-install-plugin>
-    <version.maven-invoker-plugin>3.3.0</version.maven-invoker-plugin>
-    <version.maven-javadoc-plugin>3.4.0</version.maven-javadoc-plugin>
-    <version.maven-jxr-plugin>3.2.0</version.maven-jxr-plugin>
-    <version.maven-plugin-plugin>3.6.4</version.maven-plugin-plugin>
-    <version.maven-pmd-plugin>3.17.0</version.maven-pmd-plugin>
-    <version.maven-project-info-reports-plugin>3.3.0</version.maven-project-info-reports-plugin>
-    <version.maven-resources-plugin>3.2.0</version.maven-resources-plugin>
-    <version.maven-site-plugin>4.0.0-M2</version.maven-site-plugin>
-    <version.maven-source-plugin>3.2.1</version.maven-source-plugin>
-    <version.maven-surefire-plugin>3.0.0-M7</version.maven-surefire-plugin>
-    <version.maven-surefire-report-plugin>3.0.0-M7</version.maven-surefire-report-plugin>
-    <version.spotbugs-maven-plugin>4.7.0.0</version.spotbugs-maven-plugin>
-    <version.license-maven-plugin>4.2.rc3</version.license-maven-plugin>
-    <version.versions-maven-plugin>2.11.0</version.versions-maven-plugin>
-    <version.jacoco-maven-plugin>${version.jacoco}</version.jacoco-maven-plugin>
-    <version.taglist-maven-plugin>3.0.0</version.taglist-maven-plugin>
+    <version.maven-dependency-plugin>3.8.0</version.maven-dependency-plugin>
+    <version.maven-release-plugin>3.1.1</version.maven-release-plugin>
+    <version.maven-scm-plugin>2.1.0</version.maven-scm-plugin>
+    <version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
+    <version.maven-checkstyle-plugin>3.5.0</version.maven-checkstyle-plugin>
+    <version.maven-clean-plugin>3.4.0</version.maven-clean-plugin>
+    <version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
+    <version.maven-deploy-plugin>3.1.3</version.maven-deploy-plugin>
+    <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
+    <version.maven-enforcer-plugin>3.5.0</version.maven-enforcer-plugin>
+    <version.maven-failsafe-plugin>3.5.1</version.maven-failsafe-plugin>
+    <version.maven-install-plugin>3.1.3</version.maven-install-plugin>
+    <version.maven-invoker-plugin>3.8.1</version.maven-invoker-plugin>
+    <version.maven-javadoc-plugin>3.10.1</version.maven-javadoc-plugin>
+    <version.maven-jxr-plugin>3.5.0</version.maven-jxr-plugin>
+    <version.maven-plugin-plugin>3.15.0</version.maven-plugin-plugin>
+    <version.maven-pmd-plugin>3.25.0</version.maven-pmd-plugin>
+    <version.maven-project-info-reports-plugin>3.8.0</version.maven-project-info-reports-plugin>
+    <version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
+    <version.maven-site-plugin>3.21.0</version.maven-site-plugin>
+    <version.maven-source-plugin>3.3.1</version.maven-source-plugin>
+    <version.maven-surefire-plugin>3.5.1</version.maven-surefire-plugin>
+    <version.maven-surefire-report-plugin>3.5.1</version.maven-surefire-report-plugin>
+    <version.spotbugs-maven-plugin>4.8.6.5</version.spotbugs-maven-plugin>
+    <version.license-maven-plugin>4.6</version.license-maven-plugin>
+    <version.versions-maven-plugin>2.17.1</version.versions-maven-plugin>
+    <version.jacoco-maven-plugin>0.8.12</version.jacoco-maven-plugin>
+    <version.taglist-maven-plugin>3.2.1</version.taglist-maven-plugin>
   </properties>
 
   <prerequisites>
@@ -103,6 +104,12 @@
   </prerequisites>
 
   <dependencies>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
@@ -199,6 +206,9 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.maven-compiler-plugin}</version>
           <configuration>
+            <source>${javaSourceVersion}</source>
+            <target>${javaTargetVersion}</target>
+            <release>${javaReleaseVersion}</release>
             <fork>true</fork>
             <compilerArgs>
               <arg>-Xlint:unchecked</arg>
@@ -900,13 +910,7 @@
         </reportSets>
       </plugin>
       <plugin>
-        <artifactId>maven-plugin-plugin</artifactId>
-      </plugin>
-      <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

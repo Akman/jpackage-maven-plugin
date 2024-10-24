@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2020 - 2022 Alexander Kapitman
+  Copyright (C) 2020 - 2024 Alexander Kapitman
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,67 +14,60 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/DECORATION/1.6.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/DECORATION/1.6.0
-    http://maven.apache.org/xsd/decoration-1.6.0.xsd">
+
+<!--
+  https://maven.apache.org/doxia/doxia-sitetools/doxia-site-model/site.html
+  https://maven.apache.org/skins/maven-fluido-skin/
+-->
+
+<site xmlns="http://maven.apache.org/SITE/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0
+  https://maven.apache.org/xsd/site-2.0.0.xsd">
 
   <skin>
     <groupId>org.apache.maven.skins</groupId>
     <artifactId>maven-fluido-skin</artifactId>
-    <version>1.11.1</version>
+    <version>2.0.0-M11</version>
   </skin>
 
   <!--
   <bannerLeft>
     <name />
-    <src />
     <href />
-    <alt />
-    <border />
-    <width />
-    <height />
-    <title />
+    <target />
+    <image />
   </bannerLeft>
   -->
 
   <!--
   <bannerRight>
-    <src />
     <name />
-    <alt />
     <href />
-    <border />
-    <width />
-    <height />
-    <title />
+    <target />
+    <image />
   </bannerRight>
   -->
 
-  <!--
-  <poweredBy>
-    <logo name= href= img= position= alt= border= width= height= target= title= />
-  </poweredBy>
-  -->
-
-  <!--
-    The base url to edit Doxia document sources.
-    In general, ${project.scm.url} value should do the job.
-  -->
+  <publishDate format="yyyy-MM-dd" position="none" />
+  
+  <version position="right" />
+  
   <!--
   <edit />
   -->
 
-  <!-- position=left, right, navigation-top, navigation-bottom, bottom, none -->
-  <publishDate format="yyyy-MM-dd" position="none" />
-
-  <!-- left, right, navigation-top, navigation-bottom, bottom, none -->
-  <version position="right"/>
+  <!--
+  <poweredBy>
+    <logo name= href= target= >
+      <image />
+    </logo>
+  </poweredBy>
+  -->
 
   <!--googleAdSenseClient /-->
   <!--googleAdSenseSlot /-->
   <!--googleAnalyticsAccountId /-->
-
   <!--googleAnalytics>UA-12345...</googleAnalytics-->
 
   <custom>
@@ -125,6 +118,7 @@
 
   <body>
 
+
     <!--
     <head>
       <![CDATA[<script src="..." type="text/javascript" />]]>
@@ -133,24 +127,27 @@
 
     <!--
     <links>
-      <item name="" href= img= position= alt= border= width= height= target= title= />
+      <item name="" href= target= >
+        <image src= position= alt= width= height= style= />
+      </item>
     </links>
     -->
 
     <breadcrumbs>
       <item name="${project.name}" href="index.html"/>
       <!--
-      <item name= href= img= position= alt= border= width= height= target= title= />
+      <item name= href= target= >
+        <image src= position= alt= width= height= style= />
+      </item>
       -->
     </breadcrumbs>
-
+    
     <!--
-    <menu name= inherit= inheritAsRef= ref= img= alt= position= border= width= height= title= >
-      <item collapse= ref= name= href= img= position= alt= border= width= height= target= title= >
-        <description />
-        <item>
-          ...
-        </item>
+    <menu name= inherit= inheritAsRef= ref= >
+      <image src= position= alt= width= height= style= />
+      <item collapse= ref= name= href= target= >
+        <item>...recursion...<item>
+        <image src= position= alt= width= height= style= />
       </item>
     </menu>
     -->
@@ -171,14 +168,14 @@
           href="examples/all-in-one.html"/>
     </menu>
 
-    <!--
-    <menu ref="parent" />
-    <menu ref="modules" />
-    -->
+    <!-- menu ref="parent" /-->
+
+    <!-- menu ref="modules" /-->
+
     <menu ref="reports" />
 
     <footer>&lt;div class="copyright"&gt;${copyright.notice}. All rights reserved.&lt;/div&gt;</footer>
 
   </body>
 
-</project>
+</site>
