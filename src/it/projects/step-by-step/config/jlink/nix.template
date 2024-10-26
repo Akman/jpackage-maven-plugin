@@ -1,5 +1,0 @@
-#!/bin/sh
-DIR="\${0%/*}"
-JAVA_EXEC="\$DIR/java"
-eval set -- "\$HELLO_OPTS" ${jvmArgs} -m ${moduleName}/${mainClassName} ${args} "\$@"
-exec "\$JAVA_EXEC" "\$@"

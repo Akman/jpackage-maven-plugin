@@ -36,7 +36,7 @@
     <javaVersion>23.0.1</javaVersion>
     <javaSourceVersion>${javaVersion}</javaSourceVersion>
     <javaTargetVersion>21</javaTargetVersion>
-    <javaReleaseVersion>11</javaReleaseVersion>
+    <javaReleaseVersion>14</javaReleaseVersion>
 
     <!-- Encoding -->
     <project.encoding>UTF-8</project.encoding>
@@ -48,7 +48,7 @@
 
     <!-- Tools -->
     <version.checkstyle>10.18.2</version.checkstyle>
-    <version.pmd>7.6.0</version.pmd>
+    <version.pmd>7.7.0</version.pmd>
     <version.spotbugs>4.8.6</version.spotbugs>
 
     <!-- Dependencies -->
@@ -363,6 +363,8 @@
                   <exclude>**/*.png</exclude>
                   <exclude>**/*.ico</exclude>
                   <exclude>**/*.icns</exclude>
+                  <exclude>src/it/projects/*/LICENSE</exclude>
+                  <exclude>src/it/projects/*/NOTICE</exclude>
                 </excludes>
               </licenseSet>
             </licenseSets>
@@ -532,7 +534,6 @@
           <artifactId>maven-plugin-plugin</artifactId>
           <version>${version.maven-plugin-plugin}</version>
           <configuration>
-            <!--skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound-->
             <goalPrefix>jpackage</goalPrefix>
           </configuration>
         </plugin>
@@ -544,6 +545,7 @@
               <fileset>
                 <directory>${project.basedir}</directory>
                 <includes>
+                  <include>log</include>
                   <include>*.log</include>
                 </includes>
               </fileset>
@@ -890,12 +892,13 @@
           <reportSet>
             <reports>
               <report>index</report>
+              <!--report>help</report-->
               <report>summary</report>
               <!--report>modules</report-->
               <report>dependency-management</report>
               <report>dependencies</report>
               <!--report>dependency-info</report-->
-              <!--report>dependency-convergence</report-->
+              <report>dependency-convergence</report>
               <report>plugin-management</report>
               <report>plugins</report>
               <report>distribution-management</report>

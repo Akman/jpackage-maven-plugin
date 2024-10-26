@@ -1,0 +1,26 @@
+## Velocity treats double hashes as comments, so $H can be used instead
+#set( $H = '#' )
+# jpackage:help
+
+Display help information on jpackage-maven-plugin.
+Call mvn jpackage:help -Ddetail=true -Dgoal=&lt;goal-name&gt; to display parameter
+details.
+
+Available parameters:
+
+    detail (Default: false)
+      If true, display all settable properties for each goal.
+      User property: detail
+
+    goal
+      The name of the goal for which to show help. If unspecified, all goals
+      will be displayed.
+      User property: goal
+
+    indentSize (Default: 2)
+      The number of spaces per indentation level, should be positive.
+      User property: indentSize
+
+    lineLength (Default: 80)
+      The maximum length of a display line, should be positive.
+      User property: lineLength

@@ -94,7 +94,7 @@ import ru.akman.maven.plugins.CommandLineOption;
 //    can be defined in META-INF/maven/lifecycle.xml.
 //    lifecycle = "<lifecycle>", phase="<phase>"
 // )
-public class JPackageMojo extends BaseToolMojo {
+public class JpackageMojo extends BaseToolMojo {
 
   /**
    * The name of the subdirectory where the tool live.

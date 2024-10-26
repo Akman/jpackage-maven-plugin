@@ -1,20 +1,8 @@
 ## Velocity treats double hashes as comments, so $H can be used instead
 #set( $H = '#' )
-# Plugin Documentation
+# Goals
 
-The ${project.name} lets you create an application image and installer
-with the jpackage tool introduced in Java 14.
-
-[The JPackage User's Guide.][jpackage]
-
-The main idea is to avoid being tied to project artifacts and allow the user
-to fully control the process of creating an image/installer.
-However, it is possible, of course, to customize the process using
-project artifacts.
-
-$H$H Goals
-
-This plugin has two [goals][goals]:
+This plugin has two goals:
 
 - [jpackage:jpackage][jpackagemojo] is not bound to any phase within the Maven
 lifecycle and is therefore is not automatically executed, therefore
@@ -22,56 +10,5 @@ the required phase must be specified explicitly.
 
 - [jpackage:help][helpmojo] display help information on the plugin.
 
-To create a custom runtime image/installer manually you need only to execute:
-
-```console
-mvn jpackage:jpackage
-```
-
-To display parameter details execute:
-
-```console
-mvn jpackage:help -Ddetail=true
-```
-
-$H$H Usage
-
-General instructions on how to use the ${project.name} can be found on the
-[usage page][usage]. Some more specific use cases are described in the examples
-given below.
-
-In case you still have questions regarding the plugin's usage, please
-have a look at the [FAQ][faq].
-
-If you feel like the plugin is missing a feature or has a defect, you can fill
-a feature request or bug report in our [issue tracker][issue]. When creating
-a new issue, please provide a comprehensive description of your concern.
-Especially for fixing bugs it is crucial that the developers can reproduce
-your problem. For this reason, entire debug logs, POMs or most preferably
-little demo projects attached to the issue are very much appreciated.
-
-Of course, patches are welcome, too. Contributors can check out the project
-from our [source repository][src] and will find supplementary information
-in the [guide to helping with Maven][guide].
-
-$H$H Examples
-
-To provide you with better understanding on some usages of the ${project.name},
-you can take a look into the following examples:
-
-- [Create application image from a predefined runtime image][from-runtime-image]
-- [Create application installer from the predefined application image][from-application-image]
-- [Create application installer avoiding any intermediate steps][all-in-one]
-
-[faq]: faq.html
-[usage]: usage.html
-[goals]: plugin-info.html
 [jpackagemojo]: jpackage-mojo.html
 [helpmojo]: help-mojo.html
-[from-runtime-image]: examples/from-runtime-image.html
-[from-application-image]: examples/from-application-image.html
-[all-in-one]: examples/all-in-one.html
-[src]: ${project.scm.url}
-[issue]: ${project.issueManagement.url}
-[guide]: http://maven.apache.org/guides/development/guide-helping.html
-[jpackage]: https://docs.oracle.com/en/java/javase/14/jpackage

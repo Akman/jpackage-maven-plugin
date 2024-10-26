@@ -1,0 +1,27 @@
+GPLv2+CE: javafx-base, javafx-controls, javafx-fxml, javafx-graphics, javafx-swing
+
+The Apache License, Version 2.0: org.apiguardian:apiguardian-api, org.opentest4j:opentest4j
+
+MIT License: SLF4J API Module
+
+BSD License 3: Hamcrest, Hamcrest Core
+
+Eclipse Public License v2.0: JUnit Jupiter API, JUnit Platform Commons, JUnit Platform Engine API
+
+GNU Lesser General Public License: Logback Classic Module, Logback Core Module
+
+CDDL/GPLv2+CE: JavaMail API
+
+Apache 2: Objenesis
+
+The MIT License: mockito-core, mockito-junit-jupiter
+
+Common Development and Distribution License (CDDL) v1.0: JavaBeans Activation Framework (JAF)
+
+Apache License, Version 2.0: Byte Buddy (without dependencies), Byte Buddy agent
+
+MIT License (MIT): Java Boilerplate Project
+
+The Apache Software License, Version 2.0: Apache Groovy, Spock Framework - Core Module
+
+Eclipse Public License - v 1.0: Logback Classic Module, Logback Core Module

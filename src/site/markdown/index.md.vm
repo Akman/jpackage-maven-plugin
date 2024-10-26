@@ -74,4 +74,4 @@ you can take a look into the following examples:
 [src]: ${project.scm.url}
 [issue]: ${project.issueManagement.url}
 [guide]: http://maven.apache.org/guides/development/guide-helping.html
-[jpackage]: https://docs.oracle.com/en/java/javase/14/jpackage
+[jpackage]: https://docs.oracle.com/en/java/javase/23/jpackage

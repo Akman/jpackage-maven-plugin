@@ -40,7 +40,7 @@ import ru.akman.maven.plugins.TestUtils;
 /**
  * JPackageMojo Test Class.
  */
-public class JPackageMojoTest {
+public class JpackageMojoTest {
 
   /**
    * Relative path to the base directory of tested project.

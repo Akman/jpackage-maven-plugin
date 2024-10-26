@@ -20,12 +20,36 @@ package ru.akman.maven.plugins.jpackage;
  * The type of package to create.
  */
 public enum PackageType {
+  /**
+   * Platform dependent default type.
+   */
   PLATFORM,
+  /**
+   * Application image.
+   */
   IMAGE,
+  /**
+   * Windows EXE installation package.
+   */
   EXE,
+  /**
+   * Windows MSI installation package.
+   */
   MSI,
+  /**
+   * Linux RPM installation package.
+   */
   RPM,
+  /**
+   * Linux DEB installation package.
+   */
   DEB,
+  /**
+   * Mac PKG installation package.
+   */
   PKG,
+  /**
+   * Mac DMG installation package.
+   */
   DMG
 }

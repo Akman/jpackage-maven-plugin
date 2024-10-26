@@ -1,0 +1,5 @@
+## Velocity treats double hashes as comments, so $H can be used instead
+#set( $H = '#' )
+# jpackage:jpackage
+
+Available parameters:

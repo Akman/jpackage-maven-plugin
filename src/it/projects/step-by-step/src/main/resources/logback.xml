@@ -17,13 +17,37 @@
 
 <configuration>
   <property name="LOG_PATTERN"
-      value="%d{dd-MM-yyyy HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+      value="%d{dd-MM-yyyy HH:mm:ss} [%-5p] %c{1}:%L - %m%n" />
+  <property name="LOG_PATTERN_COLORED"
+      value="%d{dd-MM-yyyy HH:mm:ss} %highlight([%-5p]) %yellow(%c{1}):%L - %green(%m%n)" />
+  <property name="LOG_PATH" value="./log" />
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN_COLORED}</pattern>
+    </encoder>
+  </appender>
+  <appender name="ROLLING_FILE"
+      class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/console.log</file>
+    <rollingPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/console.%d{dd-MM-yyyy}-%i.log</fileNamePattern>
+      <maxFileSize>10MB</maxFileSize>    
+      <maxHistory>5</maxHistory>
+      <totalSizeCap>100MB</totalSizeCap>        
+    </rollingPolicy>
     <encoder>
       <pattern>${LOG_PATTERN}</pattern>
     </encoder>
   </appender>
   <root level="error" additivity="false">
     <appender-ref ref="CONSOLE" />
+    <appender-ref ref="ROLLING_FILE" />
   </root>
+  <!--
+  <logger level="debug" additivity="true"
+      name="ru.akman.launcher.Launcher">
+    <appender-ref ref="CONSOLE" />
+  </logger>
+  -->
 </configuration>

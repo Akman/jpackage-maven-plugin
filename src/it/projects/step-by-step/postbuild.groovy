@@ -14,13 +14,22 @@
   limitations under the License.
 */
 
-String appImageName = "hello"
-String appImageVersion = "1.0"
-String appInstallerExtension = "msi"
+String appImageName = "Launcher"
 
-File appImage = new File(basedir, "target/jpackage/" + appImageName)
+String platformName = "linux"
+String appInstallerName = "launcher"
+String appImageVersion = "1.0.0"
+String archName = "amd64"
+String appInstallerExtension = "deb"
+
+String delimiter = "_"
+
+File appImage = new File(basedir, "target/jpackage/" + platformName
+    + "/" + appImageName)
 assert appImage.isDirectory()
 
-File appInstaller = new File(basedir, "target/jpackage/"
-    + appImageName + "-" + appImageVersion + "." + appInstallerExtension)
+File appInstaller = new File(basedir, "target/jpackage/" + platformName
+    + "/" + appInstallerName + delimiter + appImageVersion
+    + delimiter + archName
+    + "." + appInstallerExtension)
 assert !appInstaller.isDirectory() && appInstaller.isFile()
