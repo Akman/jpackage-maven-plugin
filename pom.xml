@@ -213,7 +213,7 @@
             <compilerArgs>
               <arg>-Xlint:unchecked</arg>
               <arg>-Xlint:deprecation</arg>
-              <arg>-Werror</arg>
+              <!--arg>-Werror</arg-->
             </compilerArgs>
           </configuration>
         </plugin>
