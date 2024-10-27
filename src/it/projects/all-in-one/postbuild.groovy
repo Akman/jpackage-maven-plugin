@@ -14,18 +14,69 @@
   limitations under the License.
 */
 
-String appImageName = "Launcher"
+def getArchName() {
+    return System.properties['os.arch'].toLowerCase()
+}
 
-String platformName = "linux"
-String appInstallerName = "launcher"
-String appImageVersion = "1.0.0"
-String archName = "amd64"
-String appInstallerExtension = "deb"
+def getPlatformName() {
+    String name = System.properties['os.name'].toLowerCase()
+    if (name.contains('windows')) {
+        return 'windows'
+    } else if (name.contains('linux')) {
+        return 'linux'
+    } else if (name.contains('mac')) {
+        return 'mac'
+    }
+    assert false : "ERROR: Unknown platform: '${name}'!"
+}
 
-String delimiter = "_"
+String platformName = getPlatformName()
+String archName = getArchName()
+String pathPrefix = "target/jpackage/${platformName}"
 
-File appInstaller = new File(basedir, "target/jpackage/" + platformName
-    + "/" + appInstallerName + delimiter + appImageVersion
-    + delimiter + archName
-    + "." + appInstallerExtension)
-assert !appInstaller.isDirectory() && appInstaller.isFile()
+// String imageDirName = ""
+String installerFileName = ""
+String installerFileVersion = ""
+String installerFileExtension = ""
+
+switch (platformName) {
+    case 'windows':
+        // imageDirName = "Launcher"
+        // imageDirName = "${pathPrefix}/${imageDirName}"
+        installerFileName = "launcher"
+        installerFileVersion = "1.0.0"
+        installerFileExtension = "msi"
+        installerFileName = "${pathPrefix}/${installerFileName}"
+        installerFileName += "_${installerFileVersion}_${archName}"
+        installerFileName += ".${installerFileExtension}"
+        break
+    case 'linux':
+        // imageDirName = "Launcher"
+        // imageDirName = "${pathPrefix}/${imageDirName}"
+        installerFileName = "launcher"
+        installerFileVersion = "1.0.0"
+        installerFileExtension = "deb"
+        installerFileName = "${pathPrefix}/${installerFileName}"
+        installerFileName += "_${installerFileVersion}_${archName}"
+        installerFileName += ".${installerFileExtension}"
+        break
+    case 'mac':
+        // imageDirName = "Launcher"
+        // imageDirName = "${pathPrefix}/${imageDirName}"
+        installerFileName = "launcher"
+        installerFileVersion = "1.0.0"
+        installerFileExtension = "dmg"
+        installerFileName = "${pathPrefix}/${installerFileName}"
+        installerFileName += "_${installerFileVersion}_${archName}"
+        installerFileName += ".${installerFileExtension}"
+        break
+    default:
+        assert false : "ERROR: Unknown platform: '${platformName}' [${archName}]!"
+        break
+}
+
+// File imageDir = new File(basedir, imageDirName)
+// assert imageDir.isDirectory()
+
+File installerFile = new File(basedir, installerFileName)
+assert !installerFile.isDirectory() && installerFile.isFile()
