@@ -43,11 +43,12 @@ switch (platformName) {
     case 'windows':
         imageDirName = "Launcher"
         imageDirName = "${pathPrefix}/${imageDirName}"
-        installerFileName = "launcher"
+        installerFileName = "Launcher"
         installerFileVersion = "1.0.0"
         installerFileExtension = "msi"
+        // Launcher-1.0.0.msi
         installerFileName = "${pathPrefix}/${installerFileName}"
-        installerFileName += "_${installerFileVersion}_${archName}"
+        installerFileName += "-${installerFileVersion}"
         installerFileName += ".${installerFileExtension}"
         break
     case 'linux':
@@ -56,6 +57,7 @@ switch (platformName) {
         installerFileName = "launcher"
         installerFileVersion = "1.0.0"
         installerFileExtension = "deb"
+        // launcher_1.0.0_amd64.deb
         installerFileName = "${pathPrefix}/${installerFileName}"
         installerFileName += "_${installerFileVersion}_${archName}"
         installerFileName += ".${installerFileExtension}"
@@ -66,6 +68,7 @@ switch (platformName) {
         installerFileName = "launcher"
         installerFileVersion = "1.0.0"
         installerFileExtension = "dmg"
+        // launcher_1.0.0_amd64.dmg
         installerFileName = "${pathPrefix}/${installerFileName}"
         installerFileName += "_${installerFileVersion}_${archName}"
         installerFileName += ".${installerFileExtension}"
