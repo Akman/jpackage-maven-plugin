@@ -675,7 +675,7 @@
                 Exclude native commands (such as java/java.exe) from the image.
                 Default value: false.
               -->
-              <stripnativecommands>false</stripnativecommands>
+              <stripnativecommands>true</stripnativecommands>
               <!--
                 De-duplicate all legal notices. If true is specified then
                 it will be an error if two files of the same filename
@@ -733,7 +733,7 @@
                 the output image: { CLIENT | SERVER | MINIMAL | ALL }
                 Default value: ALL.
               -->
-              <!--vm>ALL</vm-->
+              <vm>ALL</vm>
             </configuration>
           </plugin>
           <plugin> <!-- jpackage-maven-plugin -->
@@ -805,7 +805,7 @@
                 <configuration>
                   <!--
                     Specifies the type of package to
-                    create: { PLATFORM | IMAGE | EXE | MSI }.
+                    create: { IMAGE | PLATFORM | EXE | MSI }.
                     Default value: PLATFORM (a platform dependent default type)
                   -->
                   <type>IMAGE</type>
@@ -866,79 +866,6 @@
                     the application image into $APPDIR directory.
                   -->
                   <input>${jpackageInputDir}</input>
-                </configuration>
-              </execution>
-              <execution>
-                <id>installer</id>
-                <goals>
-                  <goal>jpackage</goal>
-                </goals>
-                <configuration>
-                  <!--
-                    Specifies the type of package to
-                    create: { PLATFORM | IMAGE | EXE | MSI }.
-                    Default value: PLATFORM (a platform dependent default type)
-                  -->
-                  <type>MSI</type>
-                  <!--
-                    Specifies the location of the predefined application image
-                    that is used to build an installable package.
-                  -->
-                  <appimage>${jpackageImageDir}</appimage>
-                  <!--
-                    Specifies the location of a properties file that contains
-                    list of key, value pairs. The keys "extension", "mime-type",
-                    "icon", and "description" can be used to describe the association.
-                  -->
-                  <fileassociations>
-                    <fileassociation>${jpackageConfigDir}/associations.properties</fileassociation>
-                  </fileassociations>
-                  <!--
-                    Specifies the relative sub-path under the default installation
-                    location of the application for Windows, or absolute path of the
-                    installation directory of the application for Mac or Linux.
-                  -->
-                  <installdir>${platformInstallDir}</installdir>
-                  <!--
-                    Specifies the location of a license file.
-                  -->
-                  <licensefile>${applicationLicenseFile}</licensefile>
-                  <!--
-                    Enable creating a console launcher for the application,
-                    should be specified for application which requires console
-                    interactions.
-                    Default value: false
-                  -->
-                  <!--winconsole>false</winconsole-->
-                  <!--
-                    Enable adding a dialog to choose a directory in which
-                    the product is installed.
-                    Default value: false
-                  -->
-                  <windirchooser>true</windirchooser>
-                  <!--
-                    Enable adding the application to the system menu.
-                    Default value: false
-                  -->
-                  <winmenu>true</winmenu>
-                  <!--
-                    Start menu group this application is placed in.
-                  -->
-                  <winmenugroup>${platformMenuGroup}</winmenugroup>
-                  <!--
-                    Enable requesting to perform an install on a per-user basis.
-                    Default value: false
-                  -->
-                  <winperuserinstall>true</winperuserinstall>
-                  <!--
-                    Enable creating a desktop shortcut for the application.
-                    Default value: false
-                  -->
-                  <winshortcut>true</winshortcut>
-                  <!--
-                    UUID associated with upgrades for this package.
-                  -->
-                  <winupgradeuuid>${platformUUID}</winupgradeuuid>
                 </configuration>
               </execution>
             </executions>
@@ -1334,7 +1261,7 @@
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               -->
-              <!--resourcedir>${jpackageResourcesDir}</resourcedir-->
+              <resourcedir>${jpackageResourcesDir}</resourcedir>
             </configuration>
             <executions>
               <execution>
@@ -1345,7 +1272,7 @@
                 <configuration>
                   <!--
                     Specifies the type of package to
-                    create: { PLATFORM | IMAGE | EXE | MSI }.
+                    create: { IMAGE | PLATFORM | DEB | RPM }.
                     Default value: PLATFORM (a platform dependent default type)
                   -->
                   <type>IMAGE</type>
@@ -1405,76 +1332,6 @@
                     the application image into $APPDIR directory.
                   -->
                   <input>${jpackageInputDir}</input>
-                </configuration>
-              </execution>
-              <execution>
-                <id>installer</id>
-                <goals>
-                  <goal>jpackage</goal>
-                </goals>
-                <configuration>
-                  <!--
-                    Specifies the type of package to
-                    create: { PLATFORM | IMAGE | EXE | MSI }.
-                    Default value: PLATFORM (a platform dependent default type)
-                  -->
-                  <type>PLATFORM</type>
-                  <!--
-                    Specifies the location of the predefined application image
-                    that is used to build an installable package.
-                  -->
-                  <appimage>${jpackageImageDir}</appimage>
-                  <!--
-                    Specifies the location of a properties file that contains
-                    list of key, value pairs. The keys "extension", "mime-type",
-                    "icon", and "description" can be used to describe the association.
-                  -->
-                  <fileassociations>
-                    <fileassociation>${jpackageConfigDir}/associations.properties</fileassociation>
-                  </fileassociations>
-                  <!--
-                    Specifies the relative sub-path under the default installation
-                    location of the application for Windows, or absolute path of the
-                    installation directory of the application for Mac or Linux.
-                  -->
-                  <installdir>${platformInstallDir}</installdir>
-                  <!--
-                    Specifies the location of a license file.
-                  -->
-                  <licensefile>${applicationLicenseFile}</licensefile>
-                  <!--linuxpackagename>linuxPackageName</linuxpackagename-->
-                  <!--
-                    Maintainer for .deb package (email).
-                  -->
-                  <!--linuxdebmaintainer>linuxDebMaintainer</linuxdebmaintainer-->
-                  <!--
-                    Menu group this application is placed in.
-                  -->
-                  <!--linuxmenugroup>linuxMenuGroup</linuxmenugroup-->
-                  <!--
-                    Required packages or capabilities for the application.
-                    Default value: false
-                  -->
-                  <!--linuxpackagedeps>false</linuxpackagedeps-->
-                  <!--
-                    Type of the license ("License: <name>" of the RPM .spec).
-                  -->
-                  <!--linuxrpmlicensetype>MIT</linuxrpmlicensetype-->
-                  <!--
-                    Release value of the RPM <name>.spec file or Debian revision value
-                    of the DEB control file.
-                  -->
-                  <!--linuxapprelease>linuxAppRelease</linuxapprelease-->
-                  <!--
-                    Group value of the RPM <name>.spec file or Section value
-                    of DEB control file.
-                  -->
-                  <!--linuxappcategory>linuxAppCategory</linuxappcategory-->
-                  <!--
-                    Creates a shortcut for the application.
-                    Default value: false
-                  -->
-                  <!--linuxshortcut>true</linuxshortcut-->
                 </configuration>
               </execution>
             </executions>
@@ -1870,7 +1727,7 @@
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               -->
-              <!--resourcedir>${jpackageResourcesDir}</resourcedir-->
+              <resourcedir>${jpackageResourcesDir}</resourcedir>
             </configuration>
             <executions>
               <execution>
@@ -1881,7 +1738,7 @@
                 <configuration>
                   <!--
                     Specifies the type of package to
-                    create: { PLATFORM | IMAGE | EXE | MSI }.
+                    create: { IMAGE | PLATFORM | PKG | APP | DMG }.
                     Default value: PLATFORM (a platform dependent default type)
                   -->
                   <type>IMAGE</type>
@@ -1941,82 +1798,6 @@
                     the application image into $APPDIR directory.
                   -->
                   <input>${jpackageInputDir}</input>
-                </configuration>
-              </execution>
-              <execution>
-                <id>installer</id>
-                <goals>
-                  <goal>jpackage</goal>
-                </goals>
-                <configuration>
-                  <!--
-                    Specifies the type of package to
-                    create: { PLATFORM | IMAGE | EXE | MSI }.
-                    Default value: PLATFORM (a platform dependent default type)
-                  -->
-                  <type>PLATFORM</type>
-                  <!--
-                    Specifies the location of the predefined application image
-                    that is used to build an installable package.
-                  -->
-                  <appimage>${jpackageImageDir}</appimage>
-                  <!--
-                    Specifies the location of a properties file that contains
-                    list of key, value pairs. The keys "extension", "mime-type",
-                    "icon", and "description" can be used to describe the association.
-                  -->
-                  <fileassociations>
-                    <fileassociation>${jpackageConfigDir}/associations.properties</fileassociation>
-                  </fileassociations>
-                  <!--
-                    Specifies the relative sub-path under the default installation
-                    location of the application for Windows, or absolute path of the
-                    installation directory of the application for Mac or Linux.
-                  -->
-                  <installdir>${platformInstallDir}</installdir>
-                  <!--
-                    Specifies the location of a license file.
-                  -->
-                  <licensefile>${applicationLicenseFile}</licensefile>
-                  <!--
-                    An identifier that uniquely identifies the application for macOS.
-                    Defaults to the main class name. May only use
-                    alphanumeric (A-Z,a-z,0-9), hyphen (-), and period (.) characters.
-                  -->
-                  <!--macpackageidentifier>macPackageIdentifier</macpackageidentifier-->
-                  <!--
-                    Name of the application as it appears in the Menu Bar.
-                    This can be different from the application name.
-                    This name must be less than 16 characters long and be suitable for
-                    displaying in the menu bar and the application Info window.
-                    Defaults to the application name.
-                  -->
-                  <!--macpackagename>macPackageName</macpackagename-->
-                  <!--
-                    When signing the application package, this value is prefixed
-                    to all components that need to be signed that don't have
-                    an existing package identifier.
-                  -->
-                  <!--macpackagesigningprefix>macPackageSigningPrefix</macpackagesigningprefix-->
-                  <!--
-                    Request that the package be signed.
-                    Default value: false
-                  -->
-                  <!--macsign>false</macsign-->
-                  <!--
-                    Path of the keychain to search for the signing identity
-                    (absolute path or relative to the current directory).
-                    If not specified, the standard keychains are used.
-                  -->
-                  <!--macsigningkeychain>macSigningKeyChain</macsigningkeychain-->
-                  <!--
-                    Team name portion in Apple signing identities' names.
-                    For example "Developer ID Application: ".
-                  -->
-                  <!--macsigningkeyusername>macSigningKeyUserName</macsigningkeyusername-->
-                  <!--
-                    Name for Linux package, defaults to the application name.
-                  -->
                 </configuration>
               </execution>
             </executions>

@@ -128,5 +128,5 @@ Pull request template: [.github/pull_request_template.md][pull_request].
 [goals]: https://akman.github.io/jpackage-maven-plugin/plugin-info.html
 [mojo_jpackage]: https://akman.github.io/jpackage-maven-plugin/jpackage-mojo.html
 [mojo_help]: https://akman.github.io/jpackage-maven-plugin/help-mojo.html
-[jpackage]: https://docs.oracle.com/en/java/javase/14/jpackage
+[jpackage]: https://docs.oracle.com/en/java/javase/23/jpackage
 [pull_request]: https://github.com/akman/jpackage-maven-plugin/blob/master/.github/pull_request_template.md

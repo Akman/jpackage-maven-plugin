@@ -406,6 +406,7 @@
         <platformUUID>8CF81762-0B19-46A6-875E-1F839A1700D0</platformUUID>
         <jlinkDir>${project.build.directory}/jlink/${platformFamily}</jlinkDir>
         <jpackageDir>${project.build.directory}/jpackage/${platformFamily}</jpackageDir>
+        <jpackageTempDir>${jpackageDir}/temp</jpackageTempDir>
       </properties>
       <build>
         <plugins>
@@ -433,7 +434,7 @@
                 If specified, the directory will not be removed upon the task
                 completion and must be removed manually.
               -->
-              <!--temp>${project.build.directory}/jpackage/temp-app-image</temp-->
+              <temp>${jpackageTempDir}</temp>
               <!--
                 Specifies the name of subdirectory relative to
                 the destination directory in which files of generated
@@ -467,7 +468,7 @@
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               -->
-              <resourcedir>${jpackageResourcesDir}</resourcedir>
+              <!--resourcedir>${jpackageResourcesDir}</resourcedir-->
             </configuration>
             <executions>
               <execution>
@@ -536,9 +537,9 @@
                     is specified), or the default set of modules (if mainjar
                     is specified) are used.
                   -->
-                  <!--addmodules>
-                    <addmodule></addmodule>
-                  </addmodules-->
+                  <addmodules>
+                    <addmodule>${applicationModuleName}</addmodule>
+                  </addmodules>
                   <!--
                     Link service provider modules and their dependencies.
                     Pass on &dash;-bind-services option to jlink.
@@ -681,6 +682,7 @@
         <platformUUID />
         <jlinkDir>${project.build.directory}/jlink/${platformFamily}</jlinkDir>
         <jpackageDir>${project.build.directory}/jpackage/${platformFamily}</jpackageDir>
+        <jpackageTempDir>${jpackageDir}/temp</jpackageTempDir>
       </properties>
       <build>
         <plugins>
@@ -708,7 +710,7 @@
                 If specified, the directory will not be removed upon the task
                 completion and must be removed manually.
               -->
-              <!--temp>${project.build.directory}/jpackage/temp-app-image</temp-->
+              <temp>${jpackageTempDir}</temp>
               <!--
                 Specifies the name of subdirectory relative to
                 the destination directory in which files of generated
@@ -742,7 +744,7 @@
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               -->
-              <resourcedir>${jpackageResourcesDir}</resourcedir>
+              <!--resourcedir>${jpackageResourcesDir}</resourcedir-->
             </configuration>
             <executions>
               <execution>
@@ -952,6 +954,7 @@
         <platformUUID />
         <jlinkDir>${project.build.directory}/jlink/${platformFamily}</jlinkDir>
         <jpackageDir>${project.build.directory}/jpackage/${platformFamily}</jpackageDir>
+        <jpackageTempDir>${jpackageDir}/temp</jpackageTempDir>
       </properties>
       <build>
         <plugins>
@@ -979,7 +982,7 @@
                 If specified, the directory will not be removed upon the task
                 completion and must be removed manually.
               -->
-              <!--temp>${project.build.directory}/jpackage/temp-app-image</temp-->
+              <temp>${jpackageTempDir}</temp>
               <!--
                 Specifies the name of subdirectory relative to
                 the destination directory in which files of generated
@@ -1013,7 +1016,7 @@
                 of jpackage can be overridden by adding replacement resources
                 to this directory.
               -->
-              <resourcedir>${jpackageResourcesDir}</resourcedir>
+              <!--resourcedir>${jpackageResourcesDir}</resourcedir-->
             </configuration>
             <executions>
               <execution>
